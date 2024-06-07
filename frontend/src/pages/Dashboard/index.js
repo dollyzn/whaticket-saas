@@ -91,7 +91,7 @@ const useStyles = makeStyles((theme) => ({
     overflow: "auto",
     flexDirection: "column",
     height: "100%",
-    backgroundColor: "#6D30EF",
+    backgroundColor: "#c90056",
     color: "#eee",
   },
   card2: {
@@ -100,7 +100,7 @@ const useStyles = makeStyles((theme) => ({
     overflow: "auto",
     flexDirection: "column",
     height: "100%",
-    backgroundColor: "#6D30EF",
+    backgroundColor: "#c90056",
     color: "#eee",
   },
   card3: {
@@ -109,7 +109,7 @@ const useStyles = makeStyles((theme) => ({
     overflow: "auto",
     flexDirection: "column",
     height: "100%",
-    backgroundColor: "#6D30EF",
+    backgroundColor: "#c90056",
     color: "#eee",
   },
   card4: {
@@ -118,7 +118,7 @@ const useStyles = makeStyles((theme) => ({
     overflow: "auto",
     flexDirection: "column",
     height: "100%",
-    backgroundColor: "#6D30EF",
+    backgroundColor: "#c90056",
     color: "#eee",
   },
   card5: {
@@ -127,7 +127,7 @@ const useStyles = makeStyles((theme) => ({
     overflow: "auto",
     flexDirection: "column",
     height: "100%",
-    backgroundColor: "#6D30EF",
+    backgroundColor: "#c90056",
     color: "#eee",
   },
   card6: {
@@ -136,7 +136,7 @@ const useStyles = makeStyles((theme) => ({
     overflow: "auto",
     flexDirection: "column",
     height: "100%",
-    backgroundColor: "#6D30EF",
+    backgroundColor: "#c90056",
     color: "#eee",
   },
   card7: {
@@ -145,7 +145,7 @@ const useStyles = makeStyles((theme) => ({
     overflow: "auto",
     flexDirection: "column",
     height: "100%",
-    backgroundColor: "#6D30EF",
+    backgroundColor: "#c90056",
     color: "#eee",
   },
   card8: {
@@ -154,7 +154,7 @@ const useStyles = makeStyles((theme) => ({
     overflow: "auto",
     flexDirection: "column",
     height: "100%",
-    backgroundColor: "#6D30EF",
+    backgroundColor: "#c90056",
     color: "#eee",
   },
   card9: {
@@ -163,7 +163,7 @@ const useStyles = makeStyles((theme) => ({
     overflow: "auto",
     flexDirection: "column",
     height: "100%",
-    backgroundColor: "#6D30EF",
+    backgroundColor: "#c90056",
     color: "#eee",
   },
 }));
