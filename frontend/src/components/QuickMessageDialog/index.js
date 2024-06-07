@@ -22,18 +22,9 @@ import api from "../../services/api";
 import toastError from "../../errors/toastError";
 import { AuthContext } from "../../context/Auth/AuthContext";
 import MessageVariablesPicker from "../MessageVariablesPicker";
-import ButtonWithSpinner from "../ButtonWithSpinner";
-
-import {
-    FormControl,
-    Grid,
-    InputLabel,
-    MenuItem,
-    Select,
-} from "@material-ui/core";
+import { Grid } from "@material-ui/core";
 import ConfirmationModal from "../ConfirmationModal";
-
-const path = require('path');
+import path from "path-browserify";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -115,7 +106,6 @@ const QuickMessageDialog = ({ open, onClose, quickemessageId, reload }) => {
     };
 
     const handleAttachmentFile = (e) => {
-      
         const file = head(e.target.files);
         if (file) {
             setAttachment(file);
@@ -123,8 +113,15 @@ const QuickMessageDialog = ({ open, onClose, quickemessageId, reload }) => {
     };
 
     const handleSaveQuickeMessage = async (values) => {
-
-        const quickemessageData = { ...values, isMedia: true, mediaPath: attachment ? String(attachment.name).replace(/ /g, "_") : values.mediaPath ? path.basename(values.mediaPath).replace(/ /g, "_") : null };
+        const quickemessageData = {
+            ...values,
+            isMedia: true,
+            mediaPath: attachment
+                ? String(attachment.name).replace(/ /g, "_")
+                : values.mediaPath
+                ? path.basename(values.mediaPath).replace(/ /g, "_")
+                : null,
+        };
 
         try {
             if (quickemessageId) {
@@ -133,10 +130,7 @@ const QuickMessageDialog = ({ open, onClose, quickemessageId, reload }) => {
                     const formData = new FormData();
                     formData.append("typeArch", "quickMessage");
                     formData.append("file", attachment);
-                    await api.post(
-                        `/quick-messages/${quickemessageId}/media-upload`,
-                        formData
-                    );
+                    await api.post(`/quick-messages/${quickemessageId}/media-upload`, formData);
                 }
             } else {
                 const { data } = await api.post("/quick-messages", quickemessageData);
@@ -149,7 +143,6 @@ const QuickMessageDialog = ({ open, onClose, quickemessageId, reload }) => {
             }
             toast.success(i18n.t("quickMessages.toasts.success"));
             if (typeof reload == "function") {
-
                 reload();
             }
         } catch (err) {
@@ -172,7 +165,6 @@ const QuickMessageDialog = ({ open, onClose, quickemessageId, reload }) => {
             }));
             toast.success(i18n.t("quickMessages.toasts.deleted"));
             if (typeof reload == "function") {
-
                 reload();
             }
         }
@@ -186,7 +178,7 @@ const QuickMessageDialog = ({ open, onClose, quickemessageId, reload }) => {
 
         setValueFunc("message", `${firstHalfText}${msgVar}${secondHalfText}`);
 
-        await new Promise(r => setTimeout(r, 100));
+        await new Promise((r) => setTimeout(r, 100));
         messageInputRef.current.setSelectionRange(newCursorPos, newCursorPos);
     };
 
@@ -200,24 +192,14 @@ const QuickMessageDialog = ({ open, onClose, quickemessageId, reload }) => {
             >
                 {i18n.t("quickMessages.confirmationModal.deleteMessage")}
             </ConfirmationModal>
-            <Dialog
-                open={open}
-                onClose={handleClose}
-                maxWidth="xs"
-                fullWidth
-                scroll="paper"
-            >
+            <Dialog open={open} onClose={handleClose} maxWidth="xs" fullWidth scroll="paper">
                 <DialogTitle id="form-dialog-title">
                     {quickemessageId
                         ? `${i18n.t("quickMessages.dialog.edit")}`
                         : `${i18n.t("quickMessages.dialog.add")}`}
                 </DialogTitle>
                 <div style={{ display: "none" }}>
-                    <input
-                        type="file"
-                        ref={attachmentFile}
-                        onChange={(e) => handleAttachmentFile(e)}
-                    />
+                    <input type="file" ref={attachmentFile} onChange={(e) => handleAttachmentFile(e)} />
                 </div>
                 <Formik
                     initialValues={quickemessage}
@@ -260,13 +242,13 @@ const QuickMessageDialog = ({ open, onClose, quickemessageId, reload }) => {
                                             multiline={true}
                                             rows={7}
                                             fullWidth
-                                        // disabled={quickemessage.mediaPath || attachment ? true : false}
+                                            // disabled={quickemessage.mediaPath || attachment ? true : false}
                                         />
                                     </Grid>
                                     <Grid item>
                                         <MessageVariablesPicker
                                             disabled={isSubmitting}
-                                            onClick={value => handleClickMsgVar(value, setFieldValue)}
+                                            onClick={(value) => handleClickMsgVar(value, setFieldValue)}
                                         />
                                     </Grid>
                                     {(quickemessage.mediaPath || attachment) && (
@@ -274,10 +256,7 @@ const QuickMessageDialog = ({ open, onClose, quickemessageId, reload }) => {
                                             <Button startIcon={<AttachFileIcon />}>
                                                 {attachment ? attachment.name : quickemessage.mediaName}
                                             </Button>
-                                            <IconButton
-                                                onClick={() => setConfirmationOpen(true)}
-                                                color="secondary"
-                                            >
+                                            <IconButton onClick={() => setConfirmationOpen(true)} color="secondary">
                                                 <DeleteOutlineIcon color="secondary" />
                                             </IconButton>
                                         </Grid>
@@ -313,12 +292,7 @@ const QuickMessageDialog = ({ open, onClose, quickemessageId, reload }) => {
                                     {quickemessageId
                                         ? `${i18n.t("quickMessages.buttons.edit")}`
                                         : `${i18n.t("quickMessages.buttons.add")}`}
-                                    {isSubmitting && (
-                                        <CircularProgress
-                                            size={24}
-                                            className={classes.buttonProgress}
-                                        />
-                                    )}
+                                    {isSubmitting && <CircularProgress size={24} className={classes.buttonProgress} />}
                                 </Button>
                             </DialogActions>
                         </Form>
