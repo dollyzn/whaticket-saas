@@ -32,12 +32,12 @@ const App = () => {
         {
             scrollbarStyles: {
                 "&::-webkit-scrollbar": {
-                    width: '8px',
-                    height: '8px',
+                    width: "8px",
+                    height: "8px",
                 },
                 "&::-webkit-scrollbar-thumb": {
-                    boxShadow: 'inset 0 0 6px rgba(0, 0, 0, 0.3)',
-                    backgroundColor: "#c90056",
+                    boxShadow: "inset 0 0 6px rgba(0, 0, 0, 0.3)",
+                    backgroundColor: mode === "light" ? "#C90003" : "#666666",
                 },
             },
             scrollbarStylesSoft: {
@@ -50,33 +50,33 @@ const App = () => {
             },
             palette: {
                 type: mode,
-                primary: { main: mode === "light" ? "#c90056" : "#FFFFFF" },
-                textPrimary: mode === "light" ? "#c90056" : "#FFFFFF",
-                borderPrimary: mode === "light" ? "#c90056" : "#FFFFFF",
+                primary: { main: mode === "light" ? "#C90003" : "#FFFFFF" },
+                textPrimary: mode === "light" ? "#C90003" : "#FFFFFF",
+                borderPrimary: mode === "light" ? "#C90003" : "#FFFFFF",
                 dark: { main: mode === "light" ? "#333333" : "#F3F3F3" },
                 light: { main: mode === "light" ? "#F3F3F3" : "#333333" },
                 tabHeaderBackground: mode === "light" ? "#EEE" : "#666",
                 optionsBackground: mode === "light" ? "#fafafa" : "#333",
-				options: mode === "light" ? "#fafafa" : "#666",
-				fontecor: mode === "light" ? "#128c7e" : "#fff",
+                options: mode === "light" ? "#fafafa" : "#666",
+                fontecor: mode === "light" ? "#128c7e" : "#fff",
                 fancyBackground: mode === "light" ? "#fafafa" : "#333",
-				bordabox: mode === "light" ? "#eee" : "#333",
-				newmessagebox: mode === "light" ? "#eee" : "#333",
-				inputdigita: mode === "light" ? "#fff" : "#666",
-				contactdrawer: mode === "light" ? "#fff" : "#666",
-				announcements: mode === "light" ? "#ededed" : "#333",
-				login: mode === "light" ? "#fff" : "#1C1C1C",
-				announcementspopover: mode === "light" ? "#fff" : "#666",
-				chatlist: mode === "light" ? "#eee" : "#666",
-				boxlist: mode === "light" ? "#ededed" : "#666",
-				boxchatlist: mode === "light" ? "#ededed" : "#333",
+                bordabox: mode === "light" ? "#eee" : "#333",
+                newmessagebox: mode === "light" ? "#eee" : "#333",
+                inputdigita: mode === "light" ? "#fff" : "#666",
+                contactdrawer: mode === "light" ? "#fff" : "#666",
+                announcements: mode === "light" ? "#ededed" : "#333",
+                login: mode === "light" ? "#fff" : "#1C1C1C",
+                announcementspopover: mode === "light" ? "#fff" : "#666",
+                chatlist: mode === "light" ? "#eee" : "#666",
+                boxlist: mode === "light" ? "#ededed" : "#666",
+                boxchatlist: mode === "light" ? "#ededed" : "#333",
                 total: mode === "light" ? "#fff" : "#222",
                 messageIcons: mode === "light" ? "grey" : "#F3F3F3",
                 inputBackground: mode === "light" ? "#FFFFFF" : "#333",
-                barraSuperior: mode === "light" ? "linear-gradient(to right, #c90056, #c90056 , #c90056)" : "#666",
-				boxticket: mode === "light" ? "#EEE" : "#666",
-				campaigntab: mode === "light" ? "#ededed" : "#666",
-				mediainput: mode === "light" ? "#ededed" : "#1c1c1c",
+                barraSuperior: mode === "light" ? "linear-gradient(to right, #C90003, #C90003 , #000000)" : "#666",
+                boxticket: mode === "light" ? "#EEE" : "#666",
+                campaigntab: mode === "light" ? "#ededed" : "#666",
+                mediainput: mode === "light" ? "#ededed" : "#1c1c1c",
             },
             mode,
         },
@@ -85,8 +85,7 @@ const App = () => {
 
     useEffect(() => {
         const i18nlocale = localStorage.getItem("i18nextLng");
-        const browserLocale =
-            i18nlocale.substring(0, 2) + i18nlocale.substring(3, 5);
+        const browserLocale = i18nlocale.substring(0, 2) + i18nlocale.substring(3, 5);
 
         if (browserLocale === "ptBR") {
             setLocale(ptBR);
@@ -96,8 +95,6 @@ const App = () => {
     useEffect(() => {
         window.localStorage.setItem("preferredTheme", mode);
     }, [mode]);
-
-
 
     return (
         <ColorModeContext.Provider value={{ colorMode }}>

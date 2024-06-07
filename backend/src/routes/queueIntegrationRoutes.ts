@@ -15,4 +15,6 @@ queueIntegrationRoutes.put("/queueIntegration/:integrationId", isAuth, QueueInte
 
 queueIntegrationRoutes.delete("/queueIntegration/:integrationId", isAuth, QueueIntegrationController.remove);
 
+queueIntegrationRoutes.post("/queueIntegration/testsession", isAuth, QueueIntegrationController.testSession);
+
 export default queueIntegrationRoutes;

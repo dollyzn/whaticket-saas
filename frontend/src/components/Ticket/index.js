@@ -69,6 +69,20 @@ const Ticket = () => {
   const [ticket, setTicket] = useState({});
 
   useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        history.push('/tickets');
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => { 
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [history]);
+
+  useEffect(() => {
     setLoading(true);
     const delayDebounceFn = setTimeout(() => {
       const fetchTicket = async () => {

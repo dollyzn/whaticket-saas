@@ -48,7 +48,6 @@ const UpdateTicketService = async ({
   ticketId,
   companyId
 }: Request): Promise<Response> => {
-
   try {
     const { status } = ticketData;
     let { queueId, userId, whatsappId } = ticketData;
@@ -67,8 +66,6 @@ const UpdateTicketService = async ({
         key
       }
     });
-
-
 
     const ticket = await ShowTicketService(ticketId, companyId);
     const ticketTraking = await FindOrCreateATicketTrakingService({
@@ -119,11 +116,11 @@ const UpdateTicketService = async ({
       );
 
       if (setting?.value === "enabled") {
-        if (ticketTraking.ratingAt == null) {
+        if (ticketTraking.ratingAt == null && ticketTraking.userId !== null) {
           const ratingTxt = ratingMessage || "";
-          let bodyRatingMessage = `\u200e${ratingTxt}\n\n`;
+          let bodyRatingMessage = `${ratingTxt}`;
           bodyRatingMessage +=
-            "Digite de 1 à 3 para qualificar nosso atendimento:\n*1* - _Insatisfeito_\n*2* - _Satisfeito_\n*3* - _Muito Satisfeito_\n\n";
+            "Digite de 1 à 3 para qualificar nosso atendimento:\n\n*1* - _Insatisfeito_\n*2* - _Satisfeito_\n*3* - _Muito Satisfeito_";
           await SendWhatsAppMessage({ body: bodyRatingMessage, ticket });
 
           await ticketTraking.update({
@@ -153,7 +150,7 @@ const UpdateTicketService = async ({
         useIntegration: false,
         typebotStatus: false,
         typebotSessionId: null
-      })
+      });
 
       ticketTraking.finishedAt = moment().toDate();
       ticketTraking.whatsappId = ticket.whatsappId;
@@ -167,69 +164,111 @@ const UpdateTicketService = async ({
       ticketTraking.queuedAt = moment().toDate();
     }
 
-    const settingsTransfTicket = await ListSettingsServiceOne({ companyId: companyId, key: "sendMsgTransfTicket" });
+    const settingsTransfTicket = await ListSettingsServiceOne({
+      companyId: companyId,
+      key: "sendMsgTransfTicket"
+    });
 
     if (settingsTransfTicket?.value === "enabled") {
       // Mensagem de transferencia da FILA
-      if (oldQueueId !== queueId && oldUserId === userId && !isNil(oldQueueId) && !isNil(queueId)) {
-
+      if (
+        oldQueueId !== queueId &&
+        oldUserId === userId &&
+        !isNil(oldQueueId) &&
+        !isNil(queueId)
+      ) {
         const queue = await Queue.findByPk(queueId);
         const wbot = await GetTicketWbot(ticket);
-        const msgtxt = "*Mensagem automática*:\nVocê foi transferido para o departamento *" + queue?.name + "*\naguarde, já vamos te atender!";
+        const msgtxt =
+          "*Mensagem automática*:\nVocê foi transferido para o departamento *" +
+          queue?.name +
+          "*\naguarde, já vamos te atender!";
 
         const queueChangedMessage = await wbot.sendMessage(
-          `${ticket.contact.number}@${ticket.isGroup ? "g.us" : "s.whatsapp.net"}`,
+          `${ticket.contact.number}@${
+            ticket.isGroup ? "g.us" : "s.whatsapp.net"
+          }`,
           {
             text: msgtxt
           }
         );
         await verifyMessage(queueChangedMessage, ticket, ticket.contact);
       }
-      else
-        // Mensagem de transferencia do ATENDENTE
-        if (oldUserId !== userId && oldQueueId === queueId && !isNil(oldUserId) && !isNil(userId)) {
-          const wbot = await GetTicketWbot(ticket);
-          const nome = await ShowUserService(ticketData.userId);
-          const msgtxt = "*Mensagem automática*:\nFoi transferido para o atendente *" + nome.name + "*\naguarde, já vamos te atender!";
+      // Mensagem de transferencia do ATENDENTE
+      else if (
+        oldUserId !== userId &&
+        oldQueueId === queueId &&
+        !isNil(oldUserId) &&
+        !isNil(userId)
+      ) {
+        const wbot = await GetTicketWbot(ticket);
+        const nome = await ShowUserService(ticketData.userId);
+        const msgtxt =
+          "*Mensagem automática*:\nFoi transferido para o atendente *" +
+          nome.name +
+          "*\naguarde, já vamos te atender!";
 
-          const queueChangedMessage = await wbot.sendMessage(
-            `${ticket.contact.number}@${ticket.isGroup ? "g.us" : "s.whatsapp.net"}`,
-            {
-              text: msgtxt
-            }
-          );
-          await verifyMessage(queueChangedMessage, ticket, ticket.contact);
-        }
-        else
-          // Mensagem de transferencia do ATENDENTE e da FILA
-          if (oldUserId !== userId && !isNil(oldUserId) && !isNil(userId) && oldQueueId !== queueId && !isNil(oldQueueId) && !isNil(queueId)) {
-            const wbot = await GetTicketWbot(ticket);
-            const queue = await Queue.findByPk(queueId);
-            const nome = await ShowUserService(ticketData.userId);
-            const msgtxt = "*Mensagem automática*:\nVocê foi transferido para o departamento *" + queue?.name + "* e contará com a presença de *" + nome.name + "*\naguarde, já vamos te atender!";
+        const queueChangedMessage = await wbot.sendMessage(
+          `${ticket.contact.number}@${
+            ticket.isGroup ? "g.us" : "s.whatsapp.net"
+          }`,
+          {
+            text: msgtxt
+          }
+        );
+        await verifyMessage(queueChangedMessage, ticket, ticket.contact);
+      }
+      // Mensagem de transferencia do ATENDENTE e da FILA
+      else if (
+        oldUserId !== userId &&
+        !isNil(oldUserId) &&
+        !isNil(userId) &&
+        oldQueueId !== queueId &&
+        !isNil(oldQueueId) &&
+        !isNil(queueId)
+      ) {
+        const wbot = await GetTicketWbot(ticket);
+        const queue = await Queue.findByPk(queueId);
+        const nome = await ShowUserService(ticketData.userId);
+        const msgtxt =
+          "*Mensagem automática*:\nVocê foi transferido para o departamento *" +
+          queue?.name +
+          "* e contará com a presença de *" +
+          nome.name +
+          "*\naguarde, já vamos te atender!";
 
-            const queueChangedMessage = await wbot.sendMessage(
-              `${ticket.contact.number}@${ticket.isGroup ? "g.us" : "s.whatsapp.net"}`,
-              {
-                text: msgtxt
-              }
-            );
-            await verifyMessage(queueChangedMessage, ticket, ticket.contact);
-          } else
-            if (oldUserId !== undefined && isNil(userId) && oldQueueId !== queueId && !isNil(queueId)) {
+        const queueChangedMessage = await wbot.sendMessage(
+          `${ticket.contact.number}@${
+            ticket.isGroup ? "g.us" : "s.whatsapp.net"
+          }`,
+          {
+            text: msgtxt
+          }
+        );
+        await verifyMessage(queueChangedMessage, ticket, ticket.contact);
+      } else if (
+        oldUserId !== undefined &&
+        isNil(userId) &&
+        oldQueueId !== queueId &&
+        !isNil(queueId)
+      ) {
+        const queue = await Queue.findByPk(queueId);
+        const wbot = await GetTicketWbot(ticket);
+        const msgtxt =
+          "*Mensagem automática*:\nVocê foi transferido para o departamento *" +
+          queue?.name +
+          "*\naguarde, já vamos te atender!";
 
-              const queue = await Queue.findByPk(queueId);
-              const wbot = await GetTicketWbot(ticket);
-              const msgtxt = "*Mensagem automática*:\nVocê foi transferido para o departamento *" + queue?.name + "*\naguarde, já vamos te atender!";
-
-              const queueChangedMessage = await wbot.sendMessage(
-                `${ticket.contact.number}@${ticket.isGroup ? "g.us" : "s.whatsapp.net"}`,
-                {
-                  text: msgtxt
-                }
-              );
-              await verifyMessage(queueChangedMessage, ticket, ticket.contact);
-            }      
+        const queueChangedMessage = await wbot.sendMessage(
+          `${ticket.contact.number}@${
+            ticket.isGroup ? "g.us" : "s.whatsapp.net"
+          }`,
+          {
+            text: msgtxt
+          }
+        );
+        await verifyMessage(queueChangedMessage, ticket, ticket.contact);
+      }
     }
 
     await ticket.update({
@@ -265,7 +304,6 @@ const UpdateTicketService = async ({
     await ticketTraking.save();
 
     if (ticket.status !== oldStatus || ticket.user?.id !== oldUserId) {
-
       io.to(oldStatus).emit(`company-${companyId}-ticket`, {
         action: "delete",
         ticketId: ticket.id

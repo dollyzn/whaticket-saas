@@ -1,26 +1,26 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useParams } from "react-router-dom";
-import { makeStyles } from "@material-ui/core/styles";
-import Button from '@material-ui/core/Button';
-import Box from '@material-ui/core/Box';
-import BottomNavigation from '@material-ui/core/BottomNavigation';
-import BottomNavigationAction from '@material-ui/core/BottomNavigationAction';
-import QuestionAnswerIcon from '@material-ui/icons/QuestionAnswer';
-import ChatIcon from '@material-ui/icons/Chat';
+import { makeStyles, useTheme } from "@material-ui/core/styles";
+import Button from "@material-ui/core/Button";
+import Box from "@material-ui/core/Box";
+import BottomNavigation from "@material-ui/core/BottomNavigation";
+import BottomNavigationAction from "@material-ui/core/BottomNavigationAction";
+import QuestionAnswerIcon from "@material-ui/icons/QuestionAnswer";
+import ChatIcon from "@material-ui/icons/Chat";
 
 import TicketsManagerTabs from "../../components/TicketsManagerTabs/";
 import Ticket from "../../components/Ticket/";
 import TicketAdvancedLayout from "../../components/TicketAdvancedLayout";
 import logo from "../../assets/logo.png"; // LOGO//
+import logoWhite from "../../assets/logo-white.png"; // LOGO//
 import { TicketsContext } from "../../context/Tickets/TicketsContext";
 
 import { i18n } from "../../translate/i18n";
 
-const useStyles = makeStyles(theme => ({
-    header: {
-    },
+const useStyles = makeStyles((theme) => ({
+    header: {},
     content: {
-        overflow: "auto"
+        overflow: "auto",
     },
     placeholderContainer: {
         display: "flex",
@@ -28,64 +28,72 @@ const useStyles = makeStyles(theme => ({
         alignItems: "center",
         justifyContent: "center",
         height: "100%",
-		backgroundColor: theme.palette.boxticket, //DARK MODE //
+        backgroundColor: theme.palette.boxticket, //DARK MODE //
     },
-    placeholderItem: {
-    }
+    placeholderItem: {},
 }));
 
 const TicketAdvanced = (props) => {
-	const classes = useStyles();
-	const { ticketId } = useParams();
-	const [option, setOption] = useState(0);
-    const { currentTicket, setCurrentTicket } = useContext(TicketsContext)
-
-    useEffect(() => {
-        if(currentTicket.id !== null) {
-            setCurrentTicket({ id: currentTicket.id, code: '#open' })
-        }
-        if (!ticketId) {
-            setOption(1)
-        }
-        return () => {
-            setCurrentTicket({ id: null, code: null })
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [])
+    const classes = useStyles();
+    const theme = useTheme();
+    const { ticketId } = useParams();
+    const [option, setOption] = useState(0);
+    const { currentTicket, setCurrentTicket } = useContext(TicketsContext);
 
     useEffect(() => {
         if (currentTicket.id !== null) {
-            setOption(0)
+            setCurrentTicket({ id: currentTicket.id, code: "#open" });
         }
-    }, [currentTicket])
+        if (!ticketId) {
+            setOption(1);
+        }
+        return () => {
+            setCurrentTicket({ id: null, code: null });
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
-	const renderPlaceholder = () => {
-		return <Box className={classes.placeholderContainer}>
-             {/*<div className={classes.placeholderItem}>{i18n.t("chat.noTicketMessage")}</div>*/}
-			// LOGO//
-			<div>
-			<center><img style={{ margin: "0 auto", width: "70%" }} src={logo} alt="logologin" /></center>
-			</div>
-			// LOGO//
-			<br />
-            <Button onClick={() => setOption(1)} variant="contained" color="primary">
-                Selecionar Ticket
-            </Button>
-        </Box>
-	}
+    useEffect(() => {
+        if (currentTicket.id !== null) {
+            setOption(0);
+        }
+    }, [currentTicket]);
 
-	const renderMessageContext = () => {
-		if (ticketId) {
-			return <Ticket />
-		}
-		return renderPlaceholder()
-	}
+    const renderPlaceholder = () => {
+        return (
+            <Box className={classes.placeholderContainer}>
+                {/*<div className={classes.placeholderItem}>{i18n.t("chat.noTicketMessage")}</div>*/}
+                // LOGO//
+                <div>
+                    <center>
+                        <img
+                            style={{ margin: "0 auto", width: "70%" }}
+                            src={theme.mode === "light" ? logo : logoWhite}
+                            alt="logologin"
+                        />
+                    </center>
+                </div>
+                // LOGO//
+                <br />
+                <Button onClick={() => setOption(1)} variant="contained" color="primary">
+                    Selecionar Ticket
+                </Button>
+            </Box>
+        );
+    };
 
-	const renderTicketsManagerTabs = () => {
-		return <TicketsManagerTabs />
-	}
+    const renderMessageContext = () => {
+        if (ticketId) {
+            return <Ticket />;
+        }
+        return renderPlaceholder();
+    };
 
-	return (
+    const renderTicketsManagerTabs = () => {
+        return <TicketsManagerTabs />;
+    };
+
+    return (
         <TicketAdvancedLayout>
             <Box className={classes.header}>
                 <BottomNavigation
@@ -100,11 +108,9 @@ const TicketAdvanced = (props) => {
                     <BottomNavigationAction label="Atendimentos" icon={<QuestionAnswerIcon />} />
                 </BottomNavigation>
             </Box>
-            <Box className={classes.content}>
-                { option === 0 ? renderMessageContext() : renderTicketsManagerTabs() }
-            </Box>
+            <Box className={classes.content}>{option === 0 ? renderMessageContext() : renderTicketsManagerTabs()}</Box>
         </TicketAdvancedLayout>
-	);
+    );
 };
 
 export default TicketAdvanced;

@@ -229,7 +229,7 @@ const useStyles = makeStyles((theme) => ({
         status: "closed",
         userId: user?.id,
         queueId: ticket?.queue?.id,
-        useIntegration: false,
+        useIntegration: true,
         promptId: null,
         integrationId: null
       });
@@ -249,7 +249,8 @@ const useStyles = makeStyles((theme) => ({
       await api.put(`/tickets/${id}`, {
         status: "open",
         userId: user?.id,
-        queueId: ticket?.queue?.id
+        queueId: ticket?.queue?.id,
+        useIntegration: false
       });
     } catch (err) {
       setLoading(false);
@@ -267,6 +268,7 @@ const useStyles = makeStyles((theme) => ({
             await api.put(`/tickets/${id}`, {
                 status: "open",
                 userId: user?.id,
+                useIntegration: false
             });
             
             let settingIndex;
@@ -367,9 +369,12 @@ const useStyles = makeStyles((theme) => ({
         ticketId={ticket.id}
       ></TicketMessagesDialog>
       <ListItem dense button
-        onClick={(e) => {
-          if (ticket.status === "pending") return;
-          handleSelectTicket(ticket);
+        onClick={() => {
+          if (ticket.status === "pending") {
+            if (profile === "admin") setOpenTicketMessageDialog(true);
+          } else {
+            handleSelectTicket(ticket);
+          }
         }}
         selected={ticketId && +ticketId === ticket.id}
         className={clsx(classes.ticket, {
@@ -416,20 +421,6 @@ const useStyles = makeStyles((theme) => ({
                 color="textPrimary"
               >
                 {ticket.contact.name}
-                {profile === "admin" && (
-                  <Tooltip title="Espiar Conversa">
-                    <VisibilityIcon
-                      onClick={() => setOpenTicketMessageDialog(true)}
-                      fontSize="small"
-                      style={{
-                        color: blue[700],
-                        cursor: "pointer",
-                        marginLeft: 10,
-                        verticalAlign: "middle"
-                      }}
-                    />
-                  </Tooltip>
-                )}
               </Typography>
               <ListItemSecondaryAction>
                 <Box className={classes.ticketInfo1}>{renderTicketInfo()}</Box>

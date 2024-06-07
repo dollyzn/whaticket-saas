@@ -5,6 +5,7 @@ import DeleteQueueIntegrationService from "../services/QueueIntegrationServices/
 import ListQueueIntegrationService from "../services/QueueIntegrationServices/ListQueueIntegrationService";
 import ShowQueueIntegrationService from "../services/QueueIntegrationServices/ShowQueueIntegrationService";
 import UpdateQueueIntegrationService from "../services/QueueIntegrationServices/UpdateQueueIntegrationService";
+import TestSessionDialogflowService from "../services/DialogflowServices/TestDialogflowService";
 
 type IndexQuery = {
   searchParam: string;
@@ -15,26 +16,40 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
   const { searchParam, pageNumber } = req.query as IndexQuery;
   const { companyId } = req.user;
 
-  const { queueIntegrations, count, hasMore } = await ListQueueIntegrationService({
-    searchParam,
-    pageNumber,
-    companyId
-  });
+  const { queueIntegrations, count, hasMore } =
+    await ListQueueIntegrationService({
+      searchParam,
+      pageNumber,
+      companyId
+    });
 
   return res.status(200).json({ queueIntegrations, count, hasMore });
 };
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
-  const { type, name, projectName, jsonContent, language, urlN8N,
+  const {
+    type,
+    name,
+    projectName,
+    jsonContent,
+    language,
+    urlN8N,
     typebotExpires,
     typebotKeywordFinish,
     typebotSlug,
     typebotUnknownMessage,
     typebotKeywordRestart,
-    typebotRestartMessage } = req.body;
+    typebotRestartMessage
+  } = req.body;
   const { companyId } = req.user;
   const queueIntegration = await CreateQueueIntegrationService({
-    type, name, projectName, jsonContent, language, urlN8N, companyId,
+    type,
+    name,
+    projectName,
+    jsonContent,
+    language,
+    urlN8N,
+    companyId,
     typebotExpires,
     typebotKeywordFinish,
     typebotSlug,
@@ -56,7 +71,10 @@ export const show = async (req: Request, res: Response): Promise<Response> => {
   const { integrationId } = req.params;
   const { companyId } = req.user;
 
-  const queueIntegration = await ShowQueueIntegrationService(integrationId, companyId);
+  const queueIntegration = await ShowQueueIntegrationService(
+    integrationId,
+    companyId
+  );
 
   return res.status(200).json(queueIntegration);
 };
@@ -69,7 +87,11 @@ export const update = async (
   const integrationData = req.body;
   const { companyId } = req.user;
 
-  const queueIntegration = await UpdateQueueIntegrationService({ integrationData, integrationId, companyId });
+  const queueIntegration = await UpdateQueueIntegrationService({
+    integrationData,
+    integrationId,
+    companyId
+  });
 
   const io = getIO();
   io.emit(`company-${companyId}-queueIntegration`, {
@@ -96,4 +118,25 @@ export const remove = async (
   });
 
   return res.status(200).send();
+};
+
+export const testSession = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const { projectName, jsonContent, language } = req.body;
+
+  const response = await TestSessionDialogflowService({
+    projectName,
+    jsonContent,
+    language
+  });
+
+  const io = getIO();
+  io.emit("dialogflow", {
+    action: "testSession",
+    response
+  });
+
+  return res.status(200).json(response);
 };
