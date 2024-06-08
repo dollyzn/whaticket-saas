@@ -15,6 +15,7 @@ import Whatsapp from "../../models/Whatsapp";
 import { logger } from "../../utils/logger";
 import createOrUpdateBaileysService from "../BaileysServices/CreateOrUpdateBaileysService";
 import CreateMessageService from "../MessageServices/CreateMessageService";
+import { debounce } from "../../helpers/Debounce";
 
 type Session = WASocket & {
   id?: number;
@@ -31,69 +32,82 @@ const wbotMonitor = async (
   companyId: number
 ): Promise<void> => {
   try {
-    wbot.ws.on("CB:call", async (node: BinaryNode) => {
-      const content = node.content[0] as any;
-
-      if (content.tag === "offer") {
-        const { from, id } = node.attrs;
-      }
-
-      if (content.tag === "terminate") {
-        const sendMsgCall = await Setting.findOne({
-          where: { key: "call", companyId }
-        });
-
-        if (sendMsgCall.value === "disabled") {
-          await wbot.sendMessage(node.attrs.from, {
-            text: "*Mensagem Automática:*\nAs chamadas de voz e vídeo estão desabilitas para esse WhatsApp, favor enviar uma mensagem de texto. Obrigado"
+    wbot.ev.on("call", async call => {
+      try {
+        if (call.length > 0) {
+          const sendMsgCall = await Setting.findOne({
+            where: { key: "call", companyId }
           });
 
-          const number = node.attrs.from.replace(/\D/g, "");
+          if (sendMsgCall.value === "disabled") {
+            const callId = call[0].id;
+            const from = call[0].from;
 
-          const contact = await Contact.findOne({
-            where: { companyId, number }
-          });
+            await wbot.rejectCall(callId, from).then(async () => {
+              const debouncedSentMessage = debounce(
+                async () => {
+                  await wbot.sendMessage(from, {
+                    text: "*Mensagem Automática:*\nAs chamadas de voz e vídeo estão desabilitas para esse WhatsApp, favor enviar uma mensagem de texto. Obrigado"
+                  });
 
-          const ticket = await Ticket.findOne({
-            where: {
-              contactId: contact.id,
-              whatsappId: wbot.id,
-              //status: { [Op.or]: ["close"] },
-              companyId
-            }
-          });
-          // se não existir o ticket não faz nada.
-          if (!ticket) return;
+                  const number = from.split(":").shift();
 
-          const date = new Date();
-          const hours = date.getHours();
-          const minutes = date.getMinutes();
+                  const contact = await Contact.findOne({
+                    where: { companyId, number }
+                  });
 
-          const body = `Chamada de voz/vídeo perdida às ${hours}:${minutes}`;
-          const messageData = {
-            id: content.attrs["call-id"],
-            ticketId: ticket.id,
-            contactId: contact.id,
-            body,
-            fromMe: false,
-            mediaType: "call_log",
-            read: true,
-            quotedMsgId: null,
-            ack: 1
-          };
+                  const ticket = await Ticket.findOne({
+                    where: {
+                      contactId: contact.id,
+                      whatsappId: wbot.id,
+                      //status: { [Op.or]: ["close"] },
+                      companyId
+                    }
+                  });
+                  // se não existir o ticket não faz nada.
+                  if (!ticket) return;
 
-          await ticket.update({
-            lastMessage: body
-          });
+                  const date = new Date();
+                  const hours = date.getHours();
+                  const minutes = date.getMinutes();
 
-          if (ticket.status === "closed") {
-            await ticket.update({
-              status: "pending"
+                  const body = `Chamada de voz/vídeo perdida às ${hours}:${minutes}`;
+                  const messageData = {
+                    id: callId,
+                    ticketId: ticket.id,
+                    contactId: contact.id,
+                    body,
+                    fromMe: false,
+                    mediaType: "call_log",
+                    read: true,
+                    quotedMsgId: null,
+                    ack: 1
+                  };
+
+                  await ticket.update({
+                    lastMessage: body
+                  });
+
+                  if (ticket.status === "closed") {
+                    await ticket.update({
+                      status: "pending"
+                    });
+                  }
+
+                  await CreateMessageService({
+                    messageData,
+                    companyId: companyId
+                  });
+                },
+                3000,
+                Number(callId.replace(/\D/g, ""))
+              );
+              debouncedSentMessage();
             });
           }
-
-          return CreateMessageService({ messageData, companyId: companyId });
         }
+      } catch (error) {
+        logger.error("Error handling call:", error);
       }
     });
 
