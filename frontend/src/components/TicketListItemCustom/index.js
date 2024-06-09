@@ -412,8 +412,8 @@ const TicketListItemCustom = ({ ticket }) => {
                                     <Tooltip title="Espiar Conversa">
                                         <VisibilityIcon
                                             onClick={(e) => {
-                                                setOpenTicketMessageDialog(true);
                                                 e.stopPropagation();
+                                                setOpenTicketMessageDialog(true);
                                             }}
                                             fontSize="small"
                                             style={{
@@ -524,8 +524,10 @@ const TicketListItemCustom = ({ ticket }) => {
                             className={classes.acceptButton}
                             size="small"
                             loading={loading}
-                            //PLW DESIGN INSERIDO O handleChangeTab
-                            onClick={(e) => handleAcepptTicket(ticket.id)}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                handleAcepptTicket(ticket.id);
+                            }}
                         >
                             {i18n.t("ticketsList.buttons.accept")}
                         </ButtonWithSpinner>
@@ -546,7 +548,10 @@ const TicketListItemCustom = ({ ticket }) => {
                             className={classes.acceptButton}
                             size="small"
                             loading={loading}
-                            onClick={(e) => handleCloseTicket(ticket.id)}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                handleCloseTicket(ticket.id);
+                            }}
                         >
                             {i18n.t("ticketsList.buttons.closed")}
                         </ButtonWithSpinner>
@@ -567,7 +572,10 @@ const TicketListItemCustom = ({ ticket }) => {
                             className={classes.acceptButton}
                             size="small"
                             loading={loading}
-                            onClick={(e) => handleReopenTicket(ticket.id)}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                handleReopenTicket(ticket.id);
+                            }}
                         >
                             {i18n.t("ticketsList.buttons.reopen")}
                         </ButtonWithSpinner>
