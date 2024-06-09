@@ -47,7 +47,7 @@ const wbotMonitor = async (
               const debouncedSentMessage = debounce(
                 async () => {
                   await wbot.sendMessage(from, {
-                    text: "*Mensagem Automática:*\nAs chamadas de voz e vídeo estão desabilitas para esse WhatsApp, favor enviar uma mensagem de texto. Obrigado"
+                    text: `*Mensagem Automática:*\nAs chamadas de voz e vídeo estão desabilitadas para este WhatsApp. Por favor, envie uma mensagem de texto.`
                   });
 
                   const number = from.split(":").shift();

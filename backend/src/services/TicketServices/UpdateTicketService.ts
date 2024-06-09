@@ -179,10 +179,7 @@ const UpdateTicketService = async ({
       ) {
         const queue = await Queue.findByPk(queueId);
         const wbot = await GetTicketWbot(ticket);
-        const msgtxt =
-          "*Mensagem automática*:\nVocê foi transferido para o departamento *" +
-          queue?.name +
-          "*\naguarde, já vamos te atender!";
+        const msgtxt = `*Mensagem automática*:\nVocê foi transferido para o departamento *${queue?.name}*\nAguarde um momento, por favor. Iremos te atender em breve!`;
 
         const queueChangedMessage = await wbot.sendMessage(
           `${ticket.contact.number}@${
@@ -203,10 +200,7 @@ const UpdateTicketService = async ({
       ) {
         const wbot = await GetTicketWbot(ticket);
         const nome = await ShowUserService(ticketData.userId);
-        const msgtxt =
-          "*Mensagem automática*:\nFoi transferido para o atendente *" +
-          nome.name +
-          "*\naguarde, já vamos te atender!";
+        const msgtxt = `*Mensagem automática*:\nVocê foi transferido para o atendente *${nome.name}*.\nAguarde um momento, por favor. Iremos te atender em breve!`;
 
         const queueChangedMessage = await wbot.sendMessage(
           `${ticket.contact.number}@${
@@ -230,12 +224,7 @@ const UpdateTicketService = async ({
         const wbot = await GetTicketWbot(ticket);
         const queue = await Queue.findByPk(queueId);
         const nome = await ShowUserService(ticketData.userId);
-        const msgtxt =
-          "*Mensagem automática*:\nVocê foi transferido para o departamento *" +
-          queue?.name +
-          "* e contará com a presença de *" +
-          nome.name +
-          "*\naguarde, já vamos te atender!";
+        const msgtxt = `*Mensagem automática*:\nVocê foi transferido para o departamento *${queue?.name}* e será atendido por *${nome.name}*.\nAguarde um momento, por favor. Iremos te atender em breve!`;
 
         const queueChangedMessage = await wbot.sendMessage(
           `${ticket.contact.number}@${
@@ -254,10 +243,7 @@ const UpdateTicketService = async ({
       ) {
         const queue = await Queue.findByPk(queueId);
         const wbot = await GetTicketWbot(ticket);
-        const msgtxt =
-          "*Mensagem automática*:\nVocê foi transferido para o departamento *" +
-          queue?.name +
-          "*\naguarde, já vamos te atender!";
+        const msgtxt = `*Mensagem automática*:\nVocê foi transferido para o departamento *${queue?.name}*\nAguarde um momento, por favor. Iremos te atender em breve!`;
 
         const queueChangedMessage = await wbot.sendMessage(
           `${ticket.contact.number}@${
