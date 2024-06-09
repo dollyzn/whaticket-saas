@@ -73,7 +73,11 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
   if (medias) {
     await Promise.all(
       medias.map(async (media: Express.Multer.File, index) => {
-        await SendWhatsAppMedia({ media, ticket, body: Array.isArray(body) ? body[index] : body });
+        await SendWhatsAppMedia({
+          media,
+          ticket,
+          body: Array.isArray(body) ? body[index] : body
+        });
       })
     );
   } else {
@@ -124,10 +128,7 @@ export const send = async (req: Request, res: Response): Promise<Response> => {
 
     const CheckValidNumber = await CheckContactNumber(numberToTest, companyId);
     const number = CheckValidNumber.jid.replace(/\D/g, "");
-    const profilePicUrl = await GetProfilePicUrl(
-      number,
-      companyId
-    );
+    const profilePicUrl = await GetProfilePicUrl(number, companyId);
     const contactData = {
       name: `${number}`,
       number,
@@ -138,7 +139,12 @@ export const send = async (req: Request, res: Response): Promise<Response> => {
 
     const contact = await CreateOrUpdateContactService(contactData);
 
-    const ticket = await FindOrCreateTicketService(contact, whatsapp.id!, 0, companyId);
+    const ticket = await FindOrCreateTicketService(
+      contact,
+      whatsapp.id!,
+      0,
+      companyId
+    );
 
     if (medias) {
       await Promise.all(
@@ -163,8 +169,8 @@ export const send = async (req: Request, res: Response): Promise<Response> => {
 
       await ticket.update({
         lastMessage: body,
+        status: "closed"
       });
-
     }
 
     if (messageData.closeTicket) {
@@ -176,7 +182,7 @@ export const send = async (req: Request, res: Response): Promise<Response> => {
         });
       }, 1000);
     }
-    
+
     SetTicketMessagesAsRead(ticket);
 
     return res.send({ mensagem: "Mensagem enviada" });
