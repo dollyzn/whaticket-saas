@@ -2114,7 +2114,10 @@ const handleMessage = async (
           !isNil(currentSchedule) &&
           (!currentSchedule || currentSchedule.inActivity === false)
         ) {
-          const body = `\u200e ${whatsapp.outOfHoursMessage}`;
+          const body = formatBody(
+            `\u200e ${whatsapp.outOfHoursMessage}`,
+            contact
+          );
 
           const debouncedSentMessage = debounce(
             async () => {
@@ -2166,7 +2169,7 @@ const handleMessage = async (
             const endTime = moment(schedule.endTime, "HH:mm");
 
             if (now.isBefore(startTime) || now.isAfter(endTime)) {
-              const body = `${queue.outOfHoursMessage}`;
+              const body = formatBody(`${queue.outOfHoursMessage}`, contact);
               const debouncedSentMessage = debounce(
                 async () => {
                   await wbot.sendMessage(
