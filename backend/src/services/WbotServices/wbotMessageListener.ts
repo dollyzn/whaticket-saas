@@ -1070,8 +1070,18 @@ const verifyQueue = async (
     return;
   }
 
+  const lastMessage = await Message.findOne({
+    where: {
+      ticketId: ticket.id,
+      fromMe: true
+    },
+    order: [["createdAt", "DESC"]]
+  });
+
   const selectedOption = getBodyMessage(msg);
-  const choosenQueue = queues[+selectedOption - 1];
+  const choosenQueue = /\*\[\s*\d+\s*\]\*\s*-\s*.*/g.test(lastMessage?.body)
+    ? queues[+selectedOption - 1]
+    : undefined;
 
   const buttonActive = await Setting.findOne({
     where: {
@@ -1274,7 +1284,8 @@ export const verifyRating = (ticketTraking: TicketTraking) => {
 export const handleRating = async (
   rate: number,
   ticket: Ticket,
-  ticketTraking: TicketTraking
+  ticketTraking: TicketTraking,
+  contact: Contact
 ) => {
   const io = getIO();
 
@@ -1301,7 +1312,8 @@ export const handleRating = async (
 
   if (complationMessage) {
     const body = formatBody(`\u200e${complationMessage}`, ticket.contact);
-    await SendWhatsAppMessage({ body, ticket });
+    const msg = await SendWhatsAppMessage({ body, ticket });
+    await verifyMessage(msg, ticket, contact);
   }
 
   await ticketTraking.update({
@@ -1928,6 +1940,7 @@ const handleMessage = async (
       msg.message?.documentMessage ||
       msg.message?.documentWithCaptionMessage ||
       msg.message.stickerMessage;
+
     if (msg.key.fromMe) {
       if (/\u200e/.test(bodyMessage)) return;
 
@@ -1938,10 +1951,9 @@ const handleMessage = async (
         msgType !== "vcard"
       )
         return;
-      msgContact = await getContactMessage(msg, wbot);
-    } else {
-      msgContact = await getContactMessage(msg, wbot);
     }
+
+    msgContact = await getContactMessage(msg, wbot);
 
     if (msgIsGroupBlock?.value === "enabled" && isGroup) return;
 
@@ -1998,16 +2010,15 @@ const handleMessage = async (
     await provider(ticket, msg, companyId, contact, wbot as WASocket);
 
     // voltar para o menu inicial
-
-    if (bodyMessage == "#") {
-      await ticket.update({
-        queueOptionId: null,
-        chatbot: false,
-        queueId: null
-      });
-      await verifyQueue(wbot, msg, ticket, ticket.contact);
-      return;
-    }
+    // if (bodyMessage === "#") {
+    //   await ticket.update({
+    //     queueOptionId: null,
+    //     chatbot: false,
+    //     queueId: null
+    //   });
+    //   await verifyQueue(wbot, msg, ticket, ticket.contact);
+    //   return;
+    // }
 
     const ticketTraking = await FindOrCreateATicketTrakingService({
       ticketId: ticket.id,
@@ -2021,30 +2032,46 @@ const handleMessage = async (
          * Tratamento para avaliação do atendente
          */
 
-        //  // dev Ricardo: insistir a responder avaliação
-        //  const rate_ = Number(bodyMessage);
+        // // dev Ricardo: insistir a responder avaliação
+        // const rate_ = Number(bodyMessage);
 
-        //  if ((ticket?.lastMessage.includes('_Insatisfeito_') || ticket?.lastMessage.includes('Por favor avalie nosso atendimento.')) &&  (!isFinite(rate_))) {
-        //      const debouncedSentMessage = debounce(
-        //        async () => {
-        //          await wbot.sendMessage(
-        //            `${ticket.contact.number}@${ticket.isGroup ? "g.us" : "s.whatsapp.net"
-        //            }`,
-        //            {
-        //              text: 'Por favor avalie nosso atendimento.'
-        //            }
-        //          );
-        //        },
-        //        1000,
-        //        ticket.id
-        //      );
-        //      debouncedSentMessage();
-        //      return;
-        //  }
-        //  // dev Ricardo
+        // if (
+        //   (ticket?.lastMessage.includes("_Insatisfeito_") ||
+        //     ticket?.lastMessage.includes(
+        //       "Por favor avalie nosso atendimento."
+        //     )) &&
+        //   !isFinite(rate_)
+        // ) {
+        //   const debouncedSentMessage = debounce(
+        //     async () => {
+        //       await wbot.sendMessage(
+        //         `${ticket.contact.number}@${
+        //           ticket.isGroup ? "g.us" : "s.whatsapp.net"
+        //         }`,
+        //         {
+        //           text: "Por favor avalie nosso atendimento."
+        //         }
+        //       );
+        //     },
+        //     1000,
+        //     ticket.id
+        //   );
+        //   debouncedSentMessage();
+        //   return;
+        // }
+        // // dev Ricardo
 
-        if (ticketTraking !== null && verifyRating(ticketTraking)) {
-          handleRating(parseFloat(bodyMessage), ticket, ticketTraking);
+        if (
+          ticketTraking !== null &&
+          isNumeric(bodyMessage) &&
+          verifyRating(ticketTraking)
+        ) {
+          await handleRating(
+            parseFloat(bodyMessage),
+            ticket,
+            ticketTraking,
+            contact
+          );
           return;
         }
       }
@@ -2158,18 +2185,6 @@ const handleMessage = async (
               return;
             }
           }
-        }
-      }
-    } catch (e) {
-      Sentry.captureException(e);
-      console.log(e);
-    }
-
-    try {
-      if (!msg.key.fromMe) {
-        if (ticketTraking !== null && verifyRating(ticketTraking)) {
-          handleRating(parseFloat(bodyMessage), ticket, ticketTraking);
-          return;
         }
       }
     } catch (e) {

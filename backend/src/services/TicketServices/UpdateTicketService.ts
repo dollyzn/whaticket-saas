@@ -53,19 +53,8 @@ const UpdateTicketService = async ({
     let { queueId, userId, whatsappId } = ticketData;
     let chatbot: boolean | null = ticketData.chatbot || false;
     let queueOptionId: number | null = ticketData.queueOptionId || null;
-    let promptId: number | null = ticketData.promptId || null;
-    let useIntegration: boolean | null = ticketData.useIntegration || false;
-    let integrationId: number | null = ticketData.integrationId || null;
 
     const io = getIO();
-
-    const key = "userRating";
-    const setting = await Setting.findOne({
-      where: {
-        companyId,
-        key
-      }
-    });
 
     const ticket = await ShowTicketService(ticketId, companyId);
     const ticketTraking = await FindOrCreateATicketTrakingService({
@@ -109,41 +98,40 @@ const UpdateTicketService = async ({
       queueOptionId = null;
     }
 
-    if (status !== undefined && ["closed"].indexOf(status) > -1) {
+    if (status && status === "closed") {
       const { complationMessage, ratingMessage } = await ShowWhatsAppService(
         ticket.whatsappId,
         companyId
       );
 
-      if (setting?.value === "enabled") {
+      const settingEvaluation = await ListSettingsServiceOne({
+        companyId: companyId,
+        key: "userRating"
+      });
+
+      if (settingEvaluation?.value === "enabled") {
         if (ticketTraking.ratingAt == null && ticketTraking.userId !== null) {
           const bodyRatingMessage = `${
             ratingMessage ? ratingMessage + "\n\n" : ""
-          }Digite de 1 a 3 para qualificar nosso atendimento:\n\n*1* - _Insatisfeito_\n*2* - _Satisfeito_\n*3* - _Muito Satisfeito_`;
+          }Digite de 1 a 5 para qualificar nosso atendimento:\n\n*5* - 😊 _Ótimo_\n*4* - 🙂 _Bom_\n*3* - 😐 _Neutro_\n*2* - 😕 _Ruim_\n*1* - 😞 _Péssimo_`;
 
           await SendWhatsAppMessage({ body: bodyRatingMessage, ticket });
 
           await ticketTraking.update({
             ratingAt: moment().toDate()
           });
-
-          io.to("open")
-            .to(ticketId.toString())
-            .emit(`company-${ticket.companyId}-ticket`, {
-              action: "delete",
-              ticketId: ticket.id
-            });
-
-          return { ticket, oldStatus, oldUserId };
         }
         ticketTraking.ratingAt = moment().toDate();
         ticketTraking.rated = false;
+      } else {
+        ticketTraking.finishedAt = moment().toDate();
+
+        if (!isNil(complationMessage) && complationMessage !== "") {
+          const body = `\u200e${complationMessage}`;
+          await SendWhatsAppMessage({ body, ticket });
+        }
       }
 
-      if (!isNil(complationMessage) && complationMessage !== "") {
-        const body = `\u200e${complationMessage}`;
-        await SendWhatsAppMessage({ body, ticket });
-      }
       await ticket.update({
         promptId: null,
         integrationId: null,
@@ -152,7 +140,6 @@ const UpdateTicketService = async ({
         typebotSessionId: null
       });
 
-      ticketTraking.finishedAt = moment().toDate();
       ticketTraking.whatsappId = ticket.whatsappId;
       ticketTraking.userId = ticket.userId;
 
@@ -268,7 +255,7 @@ const UpdateTicketService = async ({
 
     await ticket.reload();
 
-    if (status !== undefined && ["pending"].indexOf(status) > -1) {
+    if (status && status === "pending") {
       ticketTraking.update({
         whatsappId,
         queuedAt: moment().toDate(),
@@ -277,7 +264,7 @@ const UpdateTicketService = async ({
       });
     }
 
-    if (status !== undefined && ["open"].indexOf(status) > -1) {
+    if (status && status === "open") {
       ticketTraking.update({
         startedAt: moment().toDate(),
         ratingAt: null,
