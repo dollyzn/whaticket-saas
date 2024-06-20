@@ -4,7 +4,6 @@ import CheckContactOpenTickets from "../../helpers/CheckContactOpenTickets";
 import SetTicketMessagesAsRead from "../../helpers/SetTicketMessagesAsRead";
 import { getIO } from "../../libs/socket";
 import Ticket from "../../models/Ticket";
-import Setting from "../../models/Setting";
 import Queue from "../../models/Queue";
 import ShowTicketService from "./ShowTicketService";
 import ShowWhatsAppService from "../WhatsappService/ShowWhatsAppService";
@@ -12,12 +11,9 @@ import SendWhatsAppMessage from "../WbotServices/SendWhatsAppMessage";
 import FindOrCreateATicketTrakingService from "./FindOrCreateATicketTrakingService";
 import GetTicketWbot from "../../helpers/GetTicketWbot";
 import { verifyMessage } from "../WbotServices/wbotMessageListener";
-import ListSettingsServiceOne from "../SettingServices/ListSettingsServiceOne"; //NOVO PLW DESIGN//
-import ShowUserService from "../UserServices/ShowUserService"; //NOVO PLW DESIGN//
+import ListSettingsServiceOne from "../SettingServices/ListSettingsServiceOne";
+import ShowUserService from "../UserServices/ShowUserService";
 import { isNil } from "lodash";
-import Whatsapp from "../../models/Whatsapp";
-import { Op } from "sequelize";
-import AppError from "../../errors/AppError";
 
 interface TicketData {
   status?: string;
@@ -64,7 +60,7 @@ const UpdateTicketService = async ({
     });
 
     if (isNil(whatsappId)) {
-      whatsappId = ticket.whatsappId.toString();
+      whatsappId = ticket.whatsappId?.toString();
     }
 
     await SetTicketMessagesAsRead(ticket);
@@ -73,36 +69,19 @@ const UpdateTicketService = async ({
     const oldUserId = ticket.user?.id;
     const oldQueueId = ticket.queueId;
 
-    if (oldStatus === "closed" || Number(whatsappId) !== ticket.whatsappId) {
-      // let otherTicket = await Ticket.findOne({
-      //   where: {
-      //     contactId: ticket.contactId,
-      //     status: { [Op.or]: ["open", "pending", "group"] },
-      //     whatsappId
-      //   }
-      // });
-      // if (otherTicket) {
-      //     otherTicket = await ShowTicketService(otherTicket.id, companyId)
-
-      //     await ticket.update({status: "closed"})
-
-      //     io.to(oldStatus).emit(`company-${companyId}-ticket`, {
-      //       action: "delete",
-      //       ticketId: ticket.id
-      //     });
-
-      //     return { ticket: otherTicket, oldStatus, oldUserId }
-      // }
+    if (
+      oldStatus === "closed" ||
+      (whatsappId && Number(whatsappId) !== ticket.whatsappId)
+    ) {
       await CheckContactOpenTickets(ticket.contact.id, whatsappId);
       chatbot = null;
       queueOptionId = null;
     }
 
-    if (status && status === "closed") {
-      const { complationMessage, ratingMessage } = await ShowWhatsAppService(
-        ticket.whatsappId,
-        companyId
-      );
+    if (status === "closed") {
+      const { complationMessage, ratingMessage } = ticket.whatsappId
+        ? await ShowWhatsAppService(ticket.whatsappId, companyId)
+        : { complationMessage: null, ratingMessage: null };
 
       const settingEvaluation = await ListSettingsServiceOne({
         companyId: companyId,
@@ -142,9 +121,6 @@ const UpdateTicketService = async ({
 
       ticketTraking.whatsappId = ticket.whatsappId;
       ticketTraking.userId = ticket.userId;
-
-      /*    queueId = null;
-            userId = null; */
     }
 
     if (queueId !== undefined && queueId !== null) {
@@ -157,7 +133,6 @@ const UpdateTicketService = async ({
     });
 
     if (settingsTransfTicket?.value === "enabled") {
-      // Mensagem de transferencia da FILA
       if (
         oldQueueId !== queueId &&
         oldUserId === userId &&
@@ -172,14 +147,10 @@ const UpdateTicketService = async ({
           `${ticket.contact.number}@${
             ticket.isGroup ? "g.us" : "s.whatsapp.net"
           }`,
-          {
-            text: msgtxt
-          }
+          { text: msgtxt }
         );
         await verifyMessage(queueChangedMessage, ticket, ticket.contact);
-      }
-      // Mensagem de transferencia do ATENDENTE
-      else if (
+      } else if (
         oldUserId !== userId &&
         oldQueueId === queueId &&
         !isNil(oldUserId) &&
@@ -193,14 +164,10 @@ const UpdateTicketService = async ({
           `${ticket.contact.number}@${
             ticket.isGroup ? "g.us" : "s.whatsapp.net"
           }`,
-          {
-            text: msgtxt
-          }
+          { text: msgtxt }
         );
         await verifyMessage(queueChangedMessage, ticket, ticket.contact);
-      }
-      // Mensagem de transferencia do ATENDENTE e da FILA
-      else if (
+      } else if (
         oldUserId !== userId &&
         !isNil(oldUserId) &&
         !isNil(userId) &&
@@ -217,9 +184,7 @@ const UpdateTicketService = async ({
           `${ticket.contact.number}@${
             ticket.isGroup ? "g.us" : "s.whatsapp.net"
           }`,
-          {
-            text: msgtxt
-          }
+          { text: msgtxt }
         );
         await verifyMessage(queueChangedMessage, ticket, ticket.contact);
       } else if (
@@ -236,9 +201,7 @@ const UpdateTicketService = async ({
           `${ticket.contact.number}@${
             ticket.isGroup ? "g.us" : "s.whatsapp.net"
           }`,
-          {
-            text: msgtxt
-          }
+          { text: msgtxt }
         );
         await verifyMessage(queueChangedMessage, ticket, ticket.contact);
       }
@@ -255,8 +218,8 @@ const UpdateTicketService = async ({
 
     await ticket.reload();
 
-    if (status && status === "pending") {
-      ticketTraking.update({
+    if (status === "pending") {
+      await ticketTraking.update({
         whatsappId,
         queuedAt: moment().toDate(),
         startedAt: null,
@@ -264,8 +227,8 @@ const UpdateTicketService = async ({
       });
     }
 
-    if (status && status === "open") {
-      ticketTraking.update({
+    if (status === "open") {
+      await ticketTraking.update({
         startedAt: moment().toDate(),
         ratingAt: null,
         rated: false,
