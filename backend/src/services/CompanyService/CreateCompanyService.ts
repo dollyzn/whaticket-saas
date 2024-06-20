@@ -25,7 +25,6 @@ const CreateCompanyService = async (
     email,
     status,
     planId,
-    password,
     campaignsEnabled,
     dueDate,
     recurrence
@@ -45,6 +44,23 @@ const CreateCompanyService = async (
             });
 
             return !companyWithSameName;
+          }
+          return false;
+        }
+      ),
+    email: Yup.string()
+      .email("ERR_COMPANY_INVALID_NAME")
+      .required("ERR_COMPANY_INVALID_NAME")
+      .test(
+        "Check-unique-email",
+        "ERR_COMPANY_NAME_ALREADY_EXISTS",
+        async value => {
+          if (value) {
+            const companyWithSameEmail = await User.findOne({
+              where: { email: value }
+            });
+
+            return !companyWithSameEmail;
           }
           return false;
         }
@@ -70,7 +86,7 @@ const CreateCompanyService = async (
   const user = await User.create({
     name: company.name,
     email: company.email,
-    password: companyData.password,
+    password: "123456",
     profile: "admin",
     companyId: company.id
   });
@@ -84,7 +100,7 @@ const CreateCompanyService = async (
       companyId: company.id,
       key: "asaas",
       value: ""
-    },
+    }
   });
 
   //tokenixc
@@ -97,7 +113,7 @@ const CreateCompanyService = async (
       companyId: company.id,
       key: "tokenixc",
       value: ""
-    },
+    }
   });
 
   //ipixc
@@ -110,7 +126,7 @@ const CreateCompanyService = async (
       companyId: company.id,
       key: "ipixc",
       value: ""
-    },
+    }
   });
 
   //ipmkauth
@@ -123,7 +139,7 @@ const CreateCompanyService = async (
       companyId: company.id,
       key: "ipmkauth",
       value: ""
-    },
+    }
   });
 
   //clientsecretmkauth
@@ -136,7 +152,7 @@ const CreateCompanyService = async (
       companyId: company.id,
       key: "clientsecretmkauth",
       value: ""
-    },
+    }
   });
 
   //clientidmkauth
@@ -149,7 +165,7 @@ const CreateCompanyService = async (
       companyId: company.id,
       key: "clientidmkauth",
       value: ""
-    },
+    }
   });
 
   //CheckMsgIsGroup
@@ -162,7 +178,7 @@ const CreateCompanyService = async (
       companyId: company.id,
       key: "enabled",
       value: ""
-    },
+    }
   });
 
   //CheckMsgIsGroup
@@ -175,7 +191,7 @@ const CreateCompanyService = async (
       companyId: company.id,
       key: "call",
       value: "disabled"
-    },
+    }
   });
 
   //scheduleType
@@ -188,35 +204,34 @@ const CreateCompanyService = async (
       companyId: company.id,
       key: "scheduleType",
       value: "disabled"
-    },
+    }
   });
 
-
- // Enviar mensagem ao aceitar ticket
-    await Setting.findOrCreate({
-	where:{
+  // Enviar mensagem ao aceitar ticket
+  await Setting.findOrCreate({
+    where: {
       companyId: company.id,
-      key: "sendGreetingAccepted",
+      key: "sendGreetingAccepted"
     },
     defaults: {
       companyId: company.id,
       key: "sendGreetingAccepted",
       value: "disabled"
-    },
+    }
   });
-  
- // Enviar mensagem de transferencia
-    await Setting.findOrCreate({
-	where:{
+
+  // Enviar mensagem de transferencia
+  await Setting.findOrCreate({
+    where: {
       companyId: company.id,
-      key: "sendMsgTransfTicket",
+      key: "sendMsgTransfTicket"
     },
     defaults: {
       companyId: company.id,
       key: "sendMsgTransfTicket",
       value: "disabled"
-    },
- });
+    }
+  });
 
   //userRating
   await Setting.findOrCreate({
@@ -228,7 +243,7 @@ const CreateCompanyService = async (
       companyId: company.id,
       key: "userRating",
       value: "disabled"
-    },
+    }
   });
 
   //userRating
@@ -241,8 +256,7 @@ const CreateCompanyService = async (
       companyId: company.id,
       key: "chatBotType",
       value: "text"
-    },
-
+    }
   });
 
   await Setting.findOrCreate({
@@ -254,7 +268,7 @@ const CreateCompanyService = async (
       companyId: company.id,
       key: "tokensgp",
       value: ""
-    },
+    }
   });
 
   await Setting.findOrCreate({
@@ -266,7 +280,7 @@ const CreateCompanyService = async (
       companyId: company.id,
       key: "ipsgp",
       value: ""
-    },
+    }
   });
 
   await Setting.findOrCreate({
@@ -278,7 +292,7 @@ const CreateCompanyService = async (
       companyId: company.id,
       key: "appsgp",
       value: ""
-    },
+    }
   });
 
   if (companyData.campaignsEnabled !== undefined) {
@@ -291,8 +305,7 @@ const CreateCompanyService = async (
         companyId: company.id,
         key: "campaignsEnabled",
         value: `${campaignsEnabled}`
-      },
-
+      }
     });
     if (!created) {
       await setting.update({ value: `${campaignsEnabled}` });
