@@ -68,7 +68,7 @@ const CreateCompanyService = async (
   });
 
   try {
-    await companySchema.validate({ name });
+    await companySchema.validate({ name, email });
   } catch (err: any) {
     throw new AppError(err.message);
   }
