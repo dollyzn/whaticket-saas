@@ -17,16 +17,13 @@ interface WhatsappData {
   ratingMessage?: string;
   queueIds?: number[];
   token?: string;
-  //sendIdQueue?: number;
-  //timeSendQueue?: number;
-  transferQueueId?: number; 
-  timeToTransfer?: number;    
+  transferQueueId?: number;
+  timeToTransfer?: number;
   promptId?: number;
   maxUseBotQueues?: number;
   timeUseBotQueues?: number;
   expiresTicket?: number;
   expiresInactiveMessage?: string;
-
 }
 
 interface Request {
@@ -60,12 +57,10 @@ const UpdateWhatsAppService = async ({
     complationMessage,
     outOfHoursMessage,
     ratingMessage,
-    queueIds = [],
+    queueIds,
     token,
-    //timeSendQueue,
-    //sendIdQueue = null,
-    transferQueueId,	
-	timeToTransfer,	
+    transferQueueId,
+    timeToTransfer,
     promptId,
     maxUseBotQueues,
     timeUseBotQueues,
@@ -111,10 +106,8 @@ const UpdateWhatsAppService = async ({
     isDefault,
     companyId,
     token,
-    //timeSendQueue,
-    //sendIdQueue,
-    transferQueueId,	
-	timeToTransfer,	
+    transferQueueId,
+    timeToTransfer,
     promptId,
     maxUseBotQueues,
     timeUseBotQueues,
