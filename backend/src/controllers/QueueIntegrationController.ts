@@ -132,11 +132,5 @@ export const testSession = async (
     language
   });
 
-  const io = getIO();
-  io.emit("dialogflow", {
-    action: "testSession",
-    response
-  });
-
   return res.status(200).json(response);
 };
