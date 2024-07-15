@@ -21,6 +21,7 @@ import { i18n } from "../../translate/i18n";
 
 import api from "../../services/api";
 import toastError from "../../errors/toastError";
+import { FormControlLabel, Switch } from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -60,21 +61,15 @@ const ContactSchema = Yup.object().shape({
 
 const ContactModal = ({ open, onClose, contactId, initialValues, onSave }) => {
     const classes = useStyles();
-    const isMounted = useRef(true);
 
     const initialState = {
         name: "",
         number: "",
         email: "",
+        ignoreMessages: false,
     };
 
     const [contact, setContact] = useState(initialState);
-
-    useEffect(() => {
-        return () => {
-            isMounted.current = false;
-        };
-    }, []);
 
     useEffect(() => {
         const fetchContact = async () => {
@@ -88,10 +83,7 @@ const ContactModal = ({ open, onClose, contactId, initialValues, onSave }) => {
 
             try {
                 const { data } = await api.get(`/contacts/${contactId}`);
-                if (isMounted.current) {
-                    console.log(data);
-                    setContact(data);
-                }
+                setContact(data);
             } catch (err) {
                 toastError(err);
             }
@@ -108,10 +100,24 @@ const ContactModal = ({ open, onClose, contactId, initialValues, onSave }) => {
     const handleSaveContact = async (values) => {
         try {
             if (contactId) {
-                await api.put(`/contacts/${contactId}`, values);
+                await api.put(`/contacts/${contactId}`, {
+                    email: values.email,
+                    name: values.name,
+                    number: values.number,
+                    ignoreMessages: values.ignoreMessages,
+                    extraInfo: values.extraInfo,
+                });
                 handleClose();
             } else {
-                const { data } = await api.post("/contacts", values);
+                const { data } = await api.post("/contacts", {
+                    email: values.email,
+                    name: values.name,
+                    number: values.number,
+                    ignoreMessages: values.ignoreMessages,
+                    extraInfo: values.extraInfo,
+                    profilePicUrl: values.profilePicUrl,
+                    companyId: values.companyId,
+                });
                 if (onSave) {
                     onSave(data);
                 }
@@ -179,6 +185,25 @@ const ContactModal = ({ open, onClose, contactId, initialValues, onSave }) => {
                                         margin="dense"
                                         variant="outlined"
                                     />
+                                </div>
+                                <div>
+                                    <Field name="ignoreMessages">
+                                        {({ field }) => (
+                                            <FormControlLabel
+                                                style={{ marginLeft: 0, marginTop: 12 }}
+                                                label={i18n.t("contactModal.form.ignore")}
+                                                labelPlacement="start"
+                                                control={
+                                                    <Switch
+                                                        {...field}
+                                                        checked={field.value}
+                                                        size="small"
+                                                        color="primary"
+                                                    />
+                                                }
+                                            />
+                                        )}
+                                    </Field>
                                 </div>
                                 <Typography style={{ marginBottom: 8, marginTop: 12 }} variant="subtitle1">
                                     {i18n.t("contactModal.form.whatsapp")}{" "}

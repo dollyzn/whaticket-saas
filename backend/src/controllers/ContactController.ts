@@ -77,7 +77,9 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
     name: Yup.string().required(),
     number: Yup.string()
       .required()
-      .matches(/^\d+$/, "Invalid number format. Only numbers is allowed.")
+      .matches(/^\d+$/, "Invalid number format. Only numbers is allowed."),
+    email: Yup.string().email().optional(),
+    ignoreMessages: Yup.boolean().optional()
   });
 
   try {
@@ -132,7 +134,9 @@ export const update = async (
     number: Yup.string().matches(
       /^\d+$/,
       "Invalid number format. Only numbers is allowed."
-    )
+    ),
+    email: Yup.string().email().optional(),
+    ignoreMessages: Yup.boolean().optional()
   });
 
   try {

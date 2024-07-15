@@ -39,6 +39,11 @@ class Contact extends Model<Contact> {
   @Column
   email: string;
 
+  @AllowNull(false)
+  @Default(false)
+  @Column
+  ignoreMessages: boolean;
+
   @Default("")
   @Column
   profilePicUrl: string;

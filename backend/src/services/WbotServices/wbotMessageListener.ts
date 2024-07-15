@@ -1969,6 +1969,10 @@ const handleMessage = async (
     const whatsapp = await ShowWhatsAppService(wbot.id!, companyId);
     const contact = await verifyContact(msgContact, wbot, companyId);
 
+    if (contact.ignoreMessages) {
+      return;
+    }
+
     let unreadMessages = 0;
 
     if (msg.key.fromMe) {

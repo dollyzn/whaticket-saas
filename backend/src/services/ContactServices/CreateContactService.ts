@@ -11,6 +11,7 @@ interface Request {
   name: string;
   number: string;
   email?: string;
+  ignoreMessages?: boolean;
   profilePicUrl?: string;
   companyId: number;
   extraInfo?: ExtraInfo[];
@@ -20,6 +21,7 @@ const CreateContactService = async ({
   name,
   number,
   email = "",
+  ignoreMessages = false,
   companyId,
   extraInfo = []
 }: Request): Promise<Contact> => {
@@ -36,6 +38,7 @@ const CreateContactService = async ({
       name,
       number,
       email,
+      ignoreMessages,
       extraInfo,
       companyId
     },

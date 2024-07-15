@@ -9,8 +9,9 @@ interface ExtraInfo {
 }
 interface ContactData {
   email?: string;
-  number?: string;
   name?: string;
+  number?: string;
+  ignoreMessages?: boolean;
   extraInfo?: ExtraInfo[];
 }
 
@@ -25,11 +26,19 @@ const UpdateContactService = async ({
   contactId,
   companyId
 }: Request): Promise<Contact> => {
-  const { email, name, number, extraInfo } = contactData;
+  const { email, name, number, ignoreMessages, extraInfo } = contactData;
 
   const contact = await Contact.findOne({
     where: { id: contactId },
-    attributes: ["id", "name", "number", "email", "companyId", "profilePicUrl"],
+    attributes: [
+      "id",
+      "name",
+      "number",
+      "email",
+      "ignoreMessages",
+      "companyId",
+      "profilePicUrl"
+    ],
     include: ["extraInfo"]
   });
 
@@ -62,11 +71,19 @@ const UpdateContactService = async ({
   await contact.update({
     name,
     number,
-    email
+    email,
+    ignoreMessages
   });
 
   await contact.reload({
-    attributes: ["id", "name", "number", "email", "profilePicUrl"],
+    attributes: [
+      "id",
+      "name",
+      "number",
+      "email",
+      "ignoreMessages",
+      "profilePicUrl"
+    ],
     include: ["extraInfo"]
   });
 

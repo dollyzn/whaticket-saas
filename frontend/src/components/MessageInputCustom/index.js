@@ -20,7 +20,7 @@ import ClearIcon from "@material-ui/icons/Clear";
 import MicIcon from "@material-ui/icons/Mic";
 import CheckCircleOutlineIcon from "@material-ui/icons/CheckCircleOutline";
 import HighlightOffIcon from "@material-ui/icons/HighlightOff";
-import { FormControlLabel, Switch } from "@material-ui/core";
+import { FormControlLabel, Switch, Typography } from "@material-ui/core";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import { isString, isEmpty, isObject, has } from "lodash";
 
@@ -41,6 +41,15 @@ const Mp3Recorder = new MicRecorder({ bitRate: 128 });
 const useStyles = makeStyles((theme) => ({
     mainWrapper: {
         backgroundColor: theme.palette.bordabox, //DARK MODE PLW DESIGN//
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        borderTop: "1px solid rgba(0, 0, 0, 0.12)",
+    },
+
+    ignoreMessagesWrapper: {
+        backgroundColor: theme.palette.bordabox, //DARK MODE PLW DESIGN//
+        color: theme.palette.type === "dark" ? "rgba(255, 255, 255, 0.7)" : "rgba(0, 0, 0, 1)",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
@@ -84,7 +93,7 @@ const useStyles = makeStyles((theme) => ({
         position: "relative",
         justifyContent: "space-between",
         alignItems: "center",
-        backgroundColor: "#eee",
+        backgroundColor: theme.palette.newmessagebox,
         borderTop: "1px solid rgba(0, 0, 0, 0.12)",
     },
 
@@ -444,7 +453,7 @@ const CustomInput = (props) => {
 };
 
 const MessageInputCustom = (props) => {
-    const { ticketStatus, ticketId } = props;
+    const { ticketStatus, ticketId, ignoreMessages } = props;
     const classes = useStyles();
 
     const [medias, setMedias] = useState([]);
@@ -659,6 +668,21 @@ const MessageInputCustom = (props) => {
             </div>
         );
     };
+
+    if (ignoreMessages) {
+        return (
+            <Paper
+                square
+                elevation={0}
+                className={classes.ignoreMessagesWrapper}
+                style={{
+                    padding: "15px 0px",
+                }}
+            >
+                <Typography>As mensagens recebidas deste contato estão sendo ignoradas</Typography>
+            </Paper>
+        );
+    }
 
     if (medias.length > 0)
         return (

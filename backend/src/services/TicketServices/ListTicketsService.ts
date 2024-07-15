@@ -57,7 +57,14 @@ const ListTicketsService = async ({
     {
       model: Contact,
       as: "contact",
-      attributes: ["id", "name", "number", "email", "profilePicUrl"]
+      attributes: [
+        "id",
+        "name",
+        "number",
+        "email",
+        "ignoreMessages",
+        "profilePicUrl"
+      ]
     },
     {
       model: Queue,
@@ -78,7 +85,7 @@ const ListTicketsService = async ({
       model: Whatsapp,
       as: "whatsapp",
       attributes: ["name"]
-    },
+    }
   ];
 
   if (showAll === "true") {
