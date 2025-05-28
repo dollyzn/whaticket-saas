@@ -1,4 +1,4 @@
-import { proto, WASocket } from "@whiskeysockets/baileys";
+import { proto, WASocket } from "baileys";
 // import cacheLayer from "../libs/cache";
 import { getIO } from "../libs/socket";
 import Message from "../models/Message";
@@ -53,10 +53,12 @@ const SetTicketMessagesAsRead = async (ticket: Ticket): Promise<void> => {
   }
 
   const io = getIO();
-  io.to(ticket.status).to("notification").emit(`company-${ticket.companyId}-ticket`, {
-    action: "updateUnread",
-    ticketId: ticket.id
-  });
+  io.to(ticket.status)
+    .to("notification")
+    .emit(`company-${ticket.companyId}-ticket`, {
+      action: "updateUnread",
+      ticketId: ticket.id
+    });
 };
 
 export default SetTicketMessagesAsRead;

@@ -1,4 +1,4 @@
-import { WAMessage, AnyMessageContent } from "@whiskeysockets/baileys";
+import { WAMessage, AnyMessageContent } from "baileys";
 import * as Sentry from "@sentry/node";
 import fs from "fs";
 import { exec } from "child_process";
@@ -63,7 +63,7 @@ export const getMessageOptions = async (
     if (typeMessage === "video") {
       options = {
         video: fs.readFileSync(pathMedia),
-        caption: body ? body : '',
+        caption: body ? body : "",
         fileName: fileName
         // gifPlayback: true
       };
@@ -125,7 +125,7 @@ const SendWhatsAppMedia = async ({
     const pathMedia = media.path;
     const typeMessage = media.mimetype.split("/")[0];
     let options: AnyMessageContent;
-    const bodyMessage = formatBody(body, ticket.contact)
+    const bodyMessage = formatBody(body, ticket.contact);
 
     if (typeMessage === "video") {
       options = {
@@ -167,7 +167,7 @@ const SendWhatsAppMedia = async ({
     } else {
       options = {
         image: fs.readFileSync(pathMedia),
-        caption: bodyMessage,
+        caption: bodyMessage
       };
     }
 

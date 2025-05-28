@@ -1,8 +1,4 @@
-import {
-  WASocket,
-  BinaryNode,
-  Contact as BContact
-} from "@whiskeysockets/baileys";
+import { WASocket, BinaryNode, Contact as BContact } from "baileys";
 import * as Sentry from "@sentry/node";
 
 import { Op } from "sequelize";
