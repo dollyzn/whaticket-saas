@@ -8,7 +8,6 @@ import makeWASocket, {
   isJidBroadcast,
   CacheStore
 } from "baileys";
-import Redis from "ioredis";
 
 import Whatsapp from "../models/Whatsapp";
 import { logger } from "../utils/logger";
@@ -21,8 +20,6 @@ import { Store } from "./store";
 import { StartWhatsAppSession } from "../services/WbotServices/StartWhatsAppSession";
 import DeleteBaileysService from "../services/BaileysServices/DeleteBaileysService";
 import NodeCache from "node-cache";
-import { makeRedisStore } from "../store/makeRedisStore";
-import { REDIS_URI_CONNECTION } from "../config/redis";
 
 const loggerBaileys = MAIN_LOGGER.child({});
 loggerBaileys.level = "error";
@@ -87,8 +84,6 @@ export const initWASocket = async (whatsapp: Whatsapp): Promise<Session> => {
         let retriesQrCode = 0;
 
         let wsocket: Session = null;
-        const redis = new Redis(REDIS_URI_CONNECTION);
-        const store = makeRedisStore({ redis });
 
         const { state, saveState } = await authState(whatsapp);
 
@@ -216,8 +211,6 @@ export const initWASocket = async (whatsapp: Whatsapp): Promise<Session> => {
           }
         );
         wsocket.ev.on("creds.update", saveState);
-
-        store.bind(wsocket.ev);
       })();
     } catch (error) {
       Sentry.captureException(error);
