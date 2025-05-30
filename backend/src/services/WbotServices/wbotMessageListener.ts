@@ -2519,7 +2519,7 @@ const wbotMessageListener = async (
       messageUpdate.forEach(async (message: WAMessageUpdate) => {
         (wbot as WASocket)!.readMessages([message.key]);
 
-        handleMsgAck(message, message.update.status);
+        // handleMsgAck(message, message.update.status);
       });
     });
 
