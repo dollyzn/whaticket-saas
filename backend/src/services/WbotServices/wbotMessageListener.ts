@@ -466,11 +466,13 @@ const downloadMedia = async (msg: proto.IWebMessageInfo) => {
     buffer = await downloadMediaMessage(msg, "buffer", {});
   } catch (err) {
     console.error("Erro ao baixar mídia:", err);
-
-    // Trate o erro de acordo com as suas necessidades
+    return null;
   }
 
-  let filename = msg.message?.documentMessage?.fileName || "";
+  if (!buffer) {
+    console.warn("Buffer vazio ao baixar mídia.");
+    return null;
+  }
 
   const mineType =
     msg.message?.imageMessage ||
@@ -483,13 +485,22 @@ const downloadMedia = async (msg: proto.IWebMessageInfo) => {
       ?.imageMessage ||
     msg.message?.extendedTextMessage?.contextInfo?.quotedMessage?.videoMessage;
 
-  if (!mineType) console.log(msg);
+  if (!mineType?.mimetype) {
+    console.warn("Tipo MIME não identificado:", msg);
+    return null;
+  }
 
-  if (!filename) {
-    const ext = mineType.mimetype.split("/")[1].split(";")[0];
-    filename = `${msg.messageTimestamp}.${ext}`;
+  const ext = mineType.mimetype.split("/")[1].split(";")[0] || "bin";
+  const randomStr = randomBytes(4).toString("hex");
+
+  let filename = msg.message?.documentMessage?.fileName;
+  if (filename) {
+    filename = `${msg.messageTimestamp}_${randomStr}_${filename.replace(
+      /[^a-z0-9_.-]/gi,
+      "_"
+    )}`;
   } else {
-    filename = `${msg.messageTimestamp}_${filename}`;
+    filename = `${msg.messageTimestamp}_${randomStr}.${ext}`;
   }
 
   const media = {
