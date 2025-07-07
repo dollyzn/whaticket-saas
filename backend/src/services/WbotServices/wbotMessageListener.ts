@@ -58,6 +58,7 @@ import { queryDialogFlow } from "../DialogflowServices/QueryDialogflowService";
 import typebotListener from "../TypebotServices/typebotListener";
 import QueueIntegrations from "../../models/QueueIntegrations";
 import ShowQueueIntegrationService from "../QueueIntegrationServices/ShowQueueIntegrationService";
+import { randomBytes } from "crypto";
 
 const request = require("request");
 
@@ -833,7 +834,8 @@ const verifyMediaMessage = async (
 
   if (!media.filename) {
     const ext = media.mimetype.split("/")[1].split(";")[0];
-    media.filename = `${new Date().getTime()}.${ext}`;
+    const randomStr = randomBytes(4).toString("hex");
+    media.filename = `${ticket.id}-${Date.now()}-${randomStr}.${ext}`;
   }
 
   try {
