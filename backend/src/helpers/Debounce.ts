@@ -1,11 +1,11 @@
 interface Timeout {
-  id: number;
+  id: number | string;
   timeout: NodeJS.Timeout;
 }
 
 const timeouts: Timeout[] = [];
 
-const findAndClearTimeout = (ticketId: number) => {
+const findAndClearTimeout = (ticketId: number | string) => {
   if (timeouts.length > 0) {
     const timeoutIndex = timeouts.findIndex(timeout => timeout.id === ticketId);
 
@@ -19,7 +19,7 @@ const findAndClearTimeout = (ticketId: number) => {
 const debounce = (
   func: { (): Promise<void>; (...args: never[]): void },
   wait: number,
-  ticketId: number
+  ticketId: number | string
 ) => {
   return function executedFunction(...args: never[]): void {
     const later = () => {

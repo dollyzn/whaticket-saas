@@ -59,6 +59,7 @@ import typebotListener from "../TypebotServices/typebotListener";
 import QueueIntegrations from "../../models/QueueIntegrations";
 import ShowQueueIntegrationService from "../QueueIntegrationServices/ShowQueueIntegrationService";
 import { randomBytes } from "crypto";
+import PQueue from "p-queue";
 
 const request = require("request");
 
@@ -2391,9 +2392,7 @@ const handleMsgAck = async (
   msg: WAMessage,
   chat: number | null | undefined
 ) => {
-  await new Promise(r => setTimeout(r, 500));
   const io = getIO();
-
   try {
     const messageToUpdate = await Message.findByPk(msg.key.id, {
       include: [
@@ -2502,6 +2501,15 @@ const filterMessages = (msg: WAMessage): boolean => {
   return true;
 };
 
+// Fila global para limitar concorrência
+const ackQueue = new PQueue({ concurrency: 5 });
+
+// Map para manter o debounce por empresa
+const ackDebounces = new Map<number, () => void>();
+
+// Acúmulo de mensagens pendentes por empresa
+const pendingUpdates: Map<number, WAMessageUpdate[]> = new Map();
+
 const wbotMessageListener = async (
   wbot: Session,
   companyId: number
@@ -2528,12 +2536,40 @@ const wbotMessageListener = async (
     });
 
     wbot.ev.on("messages.update", (messageUpdate: WAMessageUpdate[]) => {
-      if (messageUpdate.length === 0) return;
-      messageUpdate.forEach(async (message: WAMessageUpdate) => {
-        (wbot as WASocket)!.readMessages([message.key]);
+      if (messageUpdate.length === 0 || !companyId) return;
 
-        // handleMsgAck(message, message.update.status);
-      });
+      wbot.readMessages(messageUpdate.map(msg => msg.key));
+
+      // Inicializa array de pendentes se não existir
+      if (!pendingUpdates.has(companyId)) {
+        pendingUpdates.set(companyId, []);
+      }
+
+      // Adiciona novas mensagens ao array pendente
+      const updates = pendingUpdates.get(companyId)!;
+      updates.push(...messageUpdate);
+
+      // Cria ou pega a função debounce para esta empresa
+      let debouncedAck = ackDebounces.get(companyId);
+      if (!debouncedAck) {
+        debouncedAck = debounce(
+          async () => {
+            const msgsToProcess = pendingUpdates.get(companyId)!;
+            pendingUpdates.set(companyId, []); // limpa pendentes
+
+            // Adiciona cada mensagem à fila, limitando concorrência
+            for (const msg of msgsToProcess) {
+              ackQueue.add(() => handleMsgAck(msg, msg.update.status));
+            }
+          },
+          500,
+          companyId
+        ); // 500ms de debounce
+        ackDebounces.set(companyId, debouncedAck);
+      }
+
+      // Executa debounce
+      debouncedAck();
     });
 
     // wbot.ev.on("messages.set", async (messageSet: IMessage) => {

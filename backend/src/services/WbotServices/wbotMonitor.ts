@@ -52,6 +52,8 @@ const wbotMonitor = async (
                     where: { companyId, number }
                   });
 
+                  if (!contact) return;
+
                   const ticket = await Ticket.findOne({
                     where: {
                       contactId: contact.id,

@@ -1,6 +1,5 @@
 import Redis from "ioredis";
 import { REDIS_URI_CONNECTION } from "../config/redis";
-import util from "util";
 import * as crypto from "crypto";
 
 const redis = new Redis(REDIS_URI_CONNECTION);
@@ -10,7 +9,7 @@ function encryptParams(params: any) {
   return crypto.createHash("sha256").update(str).digest("base64");
 }
 
-export function setFromParams(
+export async function setFromParams(
   key: string,
   params: any,
   value: string,
@@ -24,49 +23,44 @@ export function setFromParams(
   return set(finalKey, value);
 }
 
-export function getFromParams(key: string, params: any) {
+export async function getFromParams(key: string, params: any) {
   const finalKey = `${key}:${encryptParams(params)}`;
   return get(finalKey);
 }
 
-export function delFromParams(key: string, params: any) {
+export async function delFromParams(key: string, params: any) {
   const finalKey = `${key}:${encryptParams(params)}`;
   return del(finalKey);
 }
 
-export function set(
+export async function set(
   key: string,
   value: string,
   option?: string,
   optionValue?: string | number
 ) {
-  const setPromisefy = util.promisify(redis.set).bind(redis);
   if (option !== undefined && optionValue !== undefined) {
-    return setPromisefy(key, value, option, optionValue);
+    return redis.set(key, value, option as any, optionValue);
   }
-
-  return setPromisefy(key, value);
+  return redis.set(key, value);
 }
 
-export function get(key: string) {
-  const getPromisefy = util.promisify(redis.get).bind(redis);
-  return getPromisefy(key);
+export async function get(key: string) {
+  return redis.get(key);
 }
 
-export function getKeys(pattern: string) {
-  const getKeysPromisefy = util.promisify(redis.keys).bind(redis);
-  return getKeysPromisefy(pattern);
+export async function getKeys(pattern: string) {
+  return redis.keys(pattern);
 }
 
-export function del(key: string) {
-  const delPromisefy = util.promisify(redis.del).bind(redis);
-  return delPromisefy(key);
+export async function del(key: string) {
+  return redis.del(key);
 }
 
 export async function delFromPattern(pattern: string) {
   const all = await getKeys(pattern);
-  for (let item of all) {
-    del(item);
+  for (const item of all) {
+    await del(item);
   }
 }
 
