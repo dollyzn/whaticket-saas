@@ -1,12 +1,8 @@
+import { WASocket } from "baileys";
 import GetDefaultWhatsApp from "../../helpers/GetDefaultWhatsApp";
 import { getWbot } from "../../libs/wbot";
 
-interface IOnWhatsapp {
-  jid: string;
-  exists: boolean;
-}
-
-const checker = async (number: string, wbot: any) => {
+const checker = async (number: string, wbot: WASocket) => {
   const [validNumber] = await wbot.onWhatsApp(`${number}@s.whatsapp.net`);
   return validNumber;
 };
@@ -14,7 +10,7 @@ const checker = async (number: string, wbot: any) => {
 const CheckContactNumber = async (
   number: string,
   companyId: number
-): Promise<IOnWhatsapp> => {
+): ReturnType<typeof checker> => {
   const defaultWhatsapp = await GetDefaultWhatsApp(companyId);
 
   const wbot = getWbot(defaultWhatsapp.id);

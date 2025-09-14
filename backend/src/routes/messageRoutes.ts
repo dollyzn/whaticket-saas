@@ -11,8 +11,18 @@ const messageRoutes = Router();
 const upload = multer(uploadConfig);
 
 messageRoutes.get("/messages/:ticketId", isAuth, MessageController.index);
-messageRoutes.post("/messages/:ticketId", isAuth, upload.array("medias"), MessageController.store);
+messageRoutes.post(
+  "/messages/:ticketId",
+  isAuth,
+  upload.array("medias") as any,
+  MessageController.store
+);
 messageRoutes.delete("/messages/:messageId", isAuth, MessageController.remove);
-messageRoutes.post("/api/messages/send/:whatsappId?", tokenAuth, upload.array("medias"), MessageController.send);
+messageRoutes.post(
+  "/api/messages/send/:whatsappId?",
+  tokenAuth,
+  upload.array("medias") as any,
+  MessageController.send
+);
 
 export default messageRoutes;

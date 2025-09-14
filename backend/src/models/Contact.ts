@@ -34,6 +34,18 @@ class Contact extends Model<Contact> {
   @Column
   number: string;
 
+  // Baileys 7.x.x LID support - preferred ID by WhatsApp
+  @Column
+  contactId: string;
+
+  // LID field - present when contactId is a PN
+  @Column
+  lid: string;
+
+  // phoneNumber field - present when contactId is a LID
+  @Column
+  phoneNumber: string;
+
   @AllowNull(false)
   @Default("")
   @Column

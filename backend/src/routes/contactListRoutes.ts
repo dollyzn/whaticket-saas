@@ -20,7 +20,7 @@ routes.post("/contact-lists", isAuth, ContactListController.store);
 routes.post(
   "/contact-lists/:id/upload",
   isAuth,
-  upload.array("file"),
+  upload.array("file") as any,
   ContactListController.upload
 );
 

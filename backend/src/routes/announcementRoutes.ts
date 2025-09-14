@@ -24,7 +24,7 @@ routes.delete("/announcements/:id", isAuth, AnnouncementController.remove);
 routes.post(
   "/announcements/:id/media-upload",
   isAuth,
-  upload.array("file"),
+  upload.array("file") as any,
   AnnouncementController.mediaUpload
 );
 

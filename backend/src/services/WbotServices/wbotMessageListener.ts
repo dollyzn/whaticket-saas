@@ -60,6 +60,7 @@ import QueueIntegrations from "../../models/QueueIntegrations";
 import ShowQueueIntegrationService from "../QueueIntegrationServices/ShowQueueIntegrationService";
 import { randomBytes } from "crypto";
 import PQueue from "p-queue";
+import { storeLidPnMapping } from "../../helpers/LidPnMapping";
 
 const request = require("request");
 
@@ -429,8 +430,8 @@ export const getQuotedMessageId = (msg: proto.IWebMessageInfo) => {
 
 const getMeSocket = (wbot: Session): IMe => {
   return {
-    id: jidNormalizedUser((wbot as WASocket).user.id),
-    name: (wbot as WASocket).user.name
+    id: jidNormalizedUser(wbot.user.id),
+    name: wbot.user.name
   };
 };
 
@@ -449,16 +450,13 @@ const getSenderMessage = (
 
 const getContactMessage = async (msg: proto.IWebMessageInfo, wbot: Session) => {
   const isGroup = msg.key.remoteJid.includes("g.us");
-  const rawNumber = msg.key.remoteJid.replace(/\D/g, "");
-  return isGroup
-    ? {
-        id: getSenderMessage(msg, wbot),
-        name: msg.pushName
-      }
-    : {
-        id: msg.key.remoteJid,
-        name: msg.key.fromMe ? rawNumber : msg.pushName
-      };
+  const senderId = getSenderMessage(msg, wbot);
+  const rawNumber = senderId?.replace(/\D/g, "") || "";
+
+  return {
+    id: isGroup ? senderId : msg.key.remoteJid,
+    name: msg.key.fromMe ? rawNumber : msg.pushName || rawNumber
+  };
 };
 
 const downloadMedia = async (msg: proto.IWebMessageInfo) => {
@@ -528,11 +526,12 @@ const verifyContact = async (
 
   const contactData = {
     name: msgContact?.name || msgContact.id.replace(/\D/g, ""),
-    number: msgContact.id.replace(/\D/g, ""),
+    number: msgContact.id,
     profilePicUrl,
     isGroup: msgContact.id.includes("g.us"),
     companyId,
-    whatsappId: wbot.id
+    whatsappId: wbot.id,
+    wbot // Pass wbot for LID/PN mapping
   };
 
   const contact = CreateOrUpdateContactService(contactData);
@@ -2504,12 +2503,6 @@ const filterMessages = (msg: WAMessage): boolean => {
 // Fila global para limitar concorrência
 const ackQueue = new PQueue({ concurrency: 5 });
 
-// Map para manter o debounce por empresa
-const ackDebounces = new Map<number, () => void>();
-
-// Acúmulo de mensagens pendentes por empresa
-const pendingUpdates: Map<number, WAMessageUpdate[]> = new Map();
-
 const wbotMessageListener = async (
   wbot: Session,
   companyId: number
@@ -2540,36 +2533,54 @@ const wbotMessageListener = async (
 
       wbot.readMessages(messageUpdate.map(msg => msg.key));
 
-      // Inicializa array de pendentes se não existir
-      if (!pendingUpdates.has(companyId)) {
-        pendingUpdates.set(companyId, []);
+      // Adiciona cada mensagem à fila, limitando concorrência
+      for (const msg of messageUpdate) {
+        ackQueue.add(() => handleMsgAck(msg, msg.update.status));
       }
+    });
 
-      // Adiciona novas mensagens ao array pendente
-      const updates = pendingUpdates.get(companyId)!;
-      updates.push(...messageUpdate);
+    // Handler for LID mapping updates (Baileys 7.x.x)
+    wbot.ev.on("lid-mapping.update", async lidMappingUpdate => {
+      try {
+        logger.info(
+          `LID mapping update received for company ${companyId}:`,
+          lidMappingUpdate
+        );
 
-      // Cria ou pega a função debounce para esta empresa
-      let debouncedAck = ackDebounces.get(companyId);
-      if (!debouncedAck) {
-        debouncedAck = debounce(
-          async () => {
-            const msgsToProcess = pendingUpdates.get(companyId)!;
-            pendingUpdates.set(companyId, []); // limpa pendentes
+        // Store the LID/PN mapping if available
+        if (lidMappingUpdate.lid && lidMappingUpdate.pn) {
+          await storeLidPnMapping(wbot, {
+            lid: lidMappingUpdate.lid,
+            phoneNumber: lidMappingUpdate.pn
+          });
 
-            // Adiciona cada mensagem à fila, limitando concorrência
-            for (const msg of msgsToProcess) {
-              ackQueue.add(() => handleMsgAck(msg, msg.update.status));
-            }
-          },
-          500,
-          companyId
-        ); // 500ms de debounce
-        ackDebounces.set(companyId, debouncedAck);
+          // Update existing contacts with the new mapping
+          try {
+            const phoneNumber = lidMappingUpdate.pn.replace(/\D/g, "");
+            await Contact.update(
+              {
+                contactId: lidMappingUpdate.lid,
+                lid: lidMappingUpdate.lid,
+                phoneNumber: phoneNumber
+              },
+              {
+                where: {
+                  number: phoneNumber,
+                  companyId: companyId
+                }
+              }
+            );
+            logger.info(
+              `Updated contact with LID mapping: ${lidMappingUpdate.lid} <-> ${phoneNumber}`
+            );
+          } catch (error) {
+            logger.error("Error updating contact with LID mapping:", error);
+          }
+        }
+      } catch (error) {
+        logger.error("Error handling LID mapping update:", error);
+        Sentry.captureException(error);
       }
-
-      // Executa debounce
-      debouncedAck();
     });
 
     // wbot.ev.on("messages.set", async (messageSet: IMessage) => {

@@ -5,6 +5,7 @@ import AppError from "../../errors/AppError";
 import GetTicketWbot from "../../helpers/GetTicketWbot";
 import Message from "../../models/Message";
 import Ticket from "../../models/Ticket";
+import { getPreferredJid } from "../../helpers/LidPnMapping";
 
 import formatBody from "../../helpers/Mustache";
 
@@ -21,9 +22,27 @@ const SendWhatsAppMessage = async ({
 }: Request): Promise<WAMessage> => {
   let options = {};
   const wbot = await GetTicketWbot(ticket);
-  const number = `${ticket.contact.number}@${
-    ticket.isGroup ? "g.us" : "s.whatsapp.net"
-  }`;
+
+  // Use preferred JID (LID or PN) for the contact
+  let number =
+    ticket.contact.contactId ||
+    `${ticket.contact.number}@${ticket.isGroup ? "g.us" : "s.whatsapp.net"}`;
+
+  // Try to get preferred JID for non-group chats
+  if (!ticket.isGroup) {
+    try {
+      // Use contactId if available, otherwise fall back to number
+      if (ticket.contact.contactId) {
+        number = ticket.contact.contactId;
+      } else {
+        number = await getPreferredJid(wbot, number);
+      }
+    } catch (error) {
+      console.error("Error getting preferred JID:", error);
+      // Keep original number format as fallback
+    }
+  }
+
   if (quotedMsg) {
     const chatMessages = await Message.findOne({
       where: {

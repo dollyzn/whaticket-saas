@@ -23,7 +23,7 @@
     "@google-cloud/dialogflow": "^6.7.0",
     "@hapi/boom": "^9.1.4",
     "@sentry/node": "^6.18.1",
-    "baileys": "^6.7.19",
+    "baileys": "^7.0.0-rc.2",
     "bcryptjs": "^2.4.3",
     "bull": "^4.8.2",
     "cookie-parser": "^1.4.6",

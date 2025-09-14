@@ -28,7 +28,7 @@ routes.post("/campaigns/:id/restart", isAuth, CampaignController.restart);
 routes.post(
   "/campaigns/:id/media-upload",
   isAuth,
-  upload.array("file"),
+  upload.array("file") as any,
   CampaignController.mediaUpload
 );
 

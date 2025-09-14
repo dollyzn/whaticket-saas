@@ -1,6 +1,7 @@
 import AppError from "../../errors/AppError";
 import GetDefaultWhatsApp from "../../helpers/GetDefaultWhatsApp";
 import { getWbot } from "../../libs/wbot";
+import { isPnUser, getContactIdentifiers } from "../../helpers/LidPnMapping";
 
 const CheckIsValidContact = async (
   number: string,
@@ -12,7 +13,13 @@ const CheckIsValidContact = async (
 
   try {
     const isValidNumber = await wbot.onWhatsApp(`${number}`);
-    if (!isValidNumber) {
+    if (!isValidNumber || isValidNumber.length === 0) {
+      throw new AppError("invalidNumber");
+    }
+
+    // Check if we got valid contact info
+    const contactInfo = isValidNumber[0];
+    if (!contactInfo || !contactInfo.jid) {
       throw new AppError("invalidNumber");
     }
   } catch (err: any) {

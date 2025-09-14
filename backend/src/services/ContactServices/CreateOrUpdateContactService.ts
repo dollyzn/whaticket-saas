@@ -2,6 +2,10 @@ import { getIO } from "../../libs/socket";
 import Contact from "../../models/Contact";
 import ContactCustomField from "../../models/ContactCustomField";
 import { isNil } from "lodash";
+import { getContactIdentifiers } from "../../helpers/LidPnMapping";
+import { WASocket } from "baileys";
+import { logger } from "../../utils/logger";
+import { Op } from "sequelize";
 interface ExtraInfo extends ContactCustomField {
   name: string;
   value: string;
@@ -16,32 +20,58 @@ interface Request {
   companyId: number;
   extraInfo?: ExtraInfo[];
   whatsappId?: number;
+  wbot?: WASocket; // For LID/PN mapping
 }
 
 const CreateOrUpdateContactService = async ({
   name,
-  number: rawNumber,
+  number,
   profilePicUrl,
   isGroup,
   email = "",
   companyId,
   extraInfo = [],
-  whatsappId
+  whatsappId,
+  wbot
 }: Request): Promise<Contact> => {
-  const number = isGroup ? rawNumber : rawNumber.replace(/[^0-9]/g, "");
+  const cleanNumber = number.replace(/\D/g, "");
+
+  let contactIdentifiers: {
+    contactId: string;
+    lid?: string;
+    phoneNumber?: string;
+  } = { contactId: number };
+
+  if (wbot && !isGroup) {
+    try {
+      contactIdentifiers = await getContactIdentifiers(wbot, number);
+    } catch (error) {
+      logger.error("Error getting contact identifiers:", error);
+    }
+  }
 
   const io = getIO();
   let contact: Contact | null;
 
   contact = await Contact.findOne({
     where: {
-      number,
+      [Op.or]: [
+        { number: cleanNumber },
+        { contactId: number },
+        { lid: number },
+        { phoneNumber: cleanNumber }
+      ],
       companyId
     }
   });
 
   if (contact) {
-    contact.update({ profilePicUrl });
+    contact.update({
+      profilePicUrl,
+      contactId: contactIdentifiers.contactId,
+      lid: contactIdentifiers.lid,
+      phoneNumber: contactIdentifiers.phoneNumber
+    });
     if (isNil(contact.whatsappId === null)) {
       contact.update({
         whatsappId
@@ -54,13 +84,16 @@ const CreateOrUpdateContactService = async ({
   } else {
     contact = await Contact.create({
       name,
-      number,
+      number: cleanNumber,
       profilePicUrl,
       email,
       isGroup,
       extraInfo,
       companyId,
-      whatsappId
+      whatsappId,
+      contactId: contactIdentifiers.contactId,
+      lid: contactIdentifiers.lid,
+      phoneNumber: contactIdentifiers.phoneNumber
     });
 
     io.emit(`company-${companyId}-contact`, {
