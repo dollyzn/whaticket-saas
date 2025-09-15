@@ -53,7 +53,7 @@ const authState = async (
             let value = keys[key]?.[id];
             if (value) {
               if (type === "app-state-sync-key") {
-                value = proto.Message.AppStateSyncKeyData.decode(value);
+                value = proto.Message.AppStateSyncKeyData.create(value);
               }
               dict[id] = value;
             }

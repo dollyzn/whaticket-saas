@@ -35,7 +35,7 @@ export const getLidForPN = async (
   phoneNumber: string
 ): Promise<string | null> => {
   try {
-    const store = wbot.signalRepository?.getLIDMappingStore();
+    const store = wbot.signalRepository?.lidMapping;
     if (!store) {
       logger.warn("LID mapping store not available");
       return null;
@@ -59,7 +59,7 @@ export const getPNForLID = async (
   lid: string
 ): Promise<string | null> => {
   try {
-    const store = wbot.signalRepository?.getLIDMappingStore();
+    const store = wbot.signalRepository?.lidMapping;
     if (!store) {
       logger.warn("LID mapping store not available");
       return null;
@@ -82,13 +82,15 @@ export const storeLidPnMapping = async (
   mapping: LidPnMapping
 ): Promise<void> => {
   try {
-    const store = wbot.signalRepository?.getLIDMappingStore();
+    const store = wbot.signalRepository?.lidMapping;
     if (!store) {
       logger.warn("LID mapping store not available");
       return;
     }
 
-    await store.storeLIDPNMapping(mapping.lid, mapping.phoneNumber);
+    await store.storeLIDPNMappings([
+      { lid: mapping.lid, pn: mapping.phoneNumber }
+    ]);
     logger.info(
       `Stored LID/PN mapping: ${mapping.lid} <-> ${mapping.phoneNumber}`
     );

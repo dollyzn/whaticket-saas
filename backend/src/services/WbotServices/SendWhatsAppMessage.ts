@@ -28,20 +28,20 @@ const SendWhatsAppMessage = async ({
     ticket.contact.contactId ||
     `${ticket.contact.number}@${ticket.isGroup ? "g.us" : "s.whatsapp.net"}`;
 
-  // Try to get preferred JID for non-group chats
-  if (!ticket.isGroup) {
-    try {
-      // Use contactId if available, otherwise fall back to number
-      if (ticket.contact.contactId) {
-        number = ticket.contact.contactId;
-      } else {
-        number = await getPreferredJid(wbot, number);
-      }
-    } catch (error) {
-      console.error("Error getting preferred JID:", error);
-      // Keep original number format as fallback
-    }
-  }
+  // // Try to get preferred JID for non-group chats
+  // if (!ticket.isGroup) {
+  //   try {
+  //     // Use contactId if available, otherwise fall back to number
+  //     if (ticket.contact.contactId) {
+  //       number = ticket.contact.contactId;
+  //     } else {
+  //       number = await getPreferredJid(wbot, number);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error getting preferred JID:", error);
+  //     // Keep original number format as fallback
+  //   }
+  // }
 
   if (quotedMsg) {
     const chatMessages = await Message.findOne({
