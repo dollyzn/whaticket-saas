@@ -11,7 +11,7 @@ const GetProfilePicUrl = async (
 
   let profilePicUrl: string;
   try {
-    profilePicUrl = await wbot.profilePictureUrl(`${number}@s.whatsapp.net`);
+    profilePicUrl = await wbot.profilePictureUrl(`${number}`);
   } catch (error) {
     profilePicUrl = `${process.env.FRONTEND_URL}/nopicture.png`;
   }
