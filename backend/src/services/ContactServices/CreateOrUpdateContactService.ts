@@ -3,7 +3,7 @@ import Contact from "../../models/Contact";
 import ContactCustomField from "../../models/ContactCustomField";
 import { isNil } from "lodash";
 import { getContactIdentifiers } from "../../helpers/LidPnMapping";
-import { WASocket } from "baileys";
+import { jidNormalizedUser, WASocket } from "baileys";
 import { logger } from "../../utils/logger";
 import { Op } from "sequelize";
 interface ExtraInfo extends ContactCustomField {
@@ -35,16 +35,17 @@ const CreateOrUpdateContactService = async ({
   wbot
 }: Request): Promise<Contact> => {
   const cleanNumber = number.replace(/\D/g, "");
+  const normalizedJid = jidNormalizedUser(number);
 
   let contactIdentifiers: {
     contactId: string;
     lid?: string;
     phoneNumber?: string;
-  } = { contactId: number };
+  } = { contactId: normalizedJid };
 
   if (wbot && !isGroup) {
     try {
-      contactIdentifiers = await getContactIdentifiers(wbot, number);
+      contactIdentifiers = await getContactIdentifiers(wbot, normalizedJid);
     } catch (error) {
       logger.error("Error getting contact identifiers:", error);
     }
@@ -56,9 +57,17 @@ const CreateOrUpdateContactService = async ({
   contact = await Contact.findOne({
     where: {
       [Op.or]: [
+        {
+          contactId: {
+            [Op.in]: [normalizedJid, cleanNumber, number]
+          }
+        },
+        {
+          lid: {
+            [Op.in]: [normalizedJid, cleanNumber, number]
+          }
+        },
         { number: cleanNumber },
-        { contactId: number },
-        { lid: number },
         { phoneNumber: cleanNumber }
       ],
       companyId

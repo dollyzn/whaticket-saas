@@ -100,35 +100,6 @@ export const storeLidPnMapping = async (
 };
 
 /**
- * Gets the preferred JID (LID or PN) for a contact
- * @param wbot - WASocket instance
- * @param jid - Original JID
- * @returns Promise<string>
- */
-export const getPreferredJid = async (
-  wbot: WASocket,
-  jid: string
-): Promise<string> => {
-  try {
-    // If it's already a LID, return as is
-    if (isLidUser(jid)) {
-      return jid;
-    }
-
-    // If it's a PN, try to get the corresponding LID
-    if (isPnUser(jid)) {
-      const lid = await getLidForPN(wbot, jid);
-      return lid || jid; // Return LID if available, otherwise original PN
-    }
-
-    return jid;
-  } catch (error) {
-    logger.error("Error getting preferred JID:", error);
-    return jid;
-  }
-};
-
-/**
  * Gets the phone number from any JID format (LID or PN)
  * @param wbot - WASocket instance
  * @param jid - JID in any format
@@ -170,21 +141,21 @@ export const getContactIdentifiers = async (wbot: WASocket, jid: string) => {
   try {
     const cleanJid = jidNormalizedUser(jid).split("@")[0];
 
-    if (isLidUser(jid)) {
-      // If JID is LID, try to get corresponding PN
-      const pn = await getPNForLID(wbot, jid);
-      return {
-        contactId: jid,
-        lid: jid,
-        phoneNumber: pn ? pn.replace(/\D/g, "") : undefined
-      };
-    } else if (isPnUser(jid)) {
+    if (isPnUser(jid)) {
       // If JID is PN, try to get corresponding LID
       const lid = await getLidForPN(wbot, jid);
       return {
-        contactId: lid || jid, // Prefer LID if available
+        contactId: jid,
         lid: lid,
         phoneNumber: cleanJid.replace(/\D/g, "")
+      };
+    } else if (isLidUser(jid)) {
+      // If JID is LID, try to get corresponding PN
+      const pn = await getPNForLID(wbot, jid);
+      return {
+        contactId: pn ? `${pn}@s.whatsapp.net` : jid,
+        lid: jid,
+        phoneNumber: pn ? pn.replace(/\D/g, "") : undefined
       };
     } else {
       // Fallback for other formats

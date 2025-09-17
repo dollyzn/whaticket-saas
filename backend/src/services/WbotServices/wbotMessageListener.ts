@@ -451,11 +451,15 @@ const getSenderMessage = (
 const getContactMessage = async (msg: proto.IWebMessageInfo, wbot: Session) => {
   const isGroup = msg.key.remoteJid.includes("g.us");
   const senderId = getSenderMessage(msg, wbot);
-  const rawNumber = senderId?.replace(/\D/g, "") || "";
+  const rawNumber = msg.key.remoteJid?.replace(/\D/g, "") || "";
 
   return {
     id: isGroup ? senderId : msg.key.remoteJid,
-    name: msg.key.fromMe ? rawNumber : msg.pushName || rawNumber
+    name: isGroup
+      ? msg.pushName
+      : msg.key.fromMe
+      ? rawNumber
+      : msg.pushName || rawNumber
   };
 };
 
