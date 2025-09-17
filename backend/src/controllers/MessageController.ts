@@ -130,7 +130,7 @@ export const send = async (req: Request, res: Response): Promise<Response> => {
     const number = checkValidNumber.jid || checkValidNumber.lid;
     const profilePicUrl = await GetProfilePicUrl(number, companyId);
     const contactData = {
-      name: number,
+      name: number.replace(/\D/g, ""),
       number,
       profilePicUrl,
       isGroup: false,
