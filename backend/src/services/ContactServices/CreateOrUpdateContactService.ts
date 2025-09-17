@@ -77,6 +77,7 @@ const CreateOrUpdateContactService = async ({
   if (contact) {
     contact.update({
       profilePicUrl,
+      number: contactIdentifiers.phoneNumber || cleanNumber,
       contactId: contactIdentifiers.contactId,
       lid: contactIdentifiers.lid,
       phoneNumber: contactIdentifiers.phoneNumber
