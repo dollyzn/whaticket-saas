@@ -13,7 +13,8 @@ const KEY_MAP: { [T in keyof SignalDataTypeMap]: string } = {
   "app-state-sync-key": "appStateSyncKeys",
   "app-state-sync-version": "appStateVersions",
   "sender-key-memory": "senderKeyMemory",
-  "lid-mapping": "lidMapping"
+  "lid-mapping": "lidMapping",
+  "device-list": "deviceList"
 };
 
 const authState = async (
