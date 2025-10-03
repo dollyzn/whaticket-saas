@@ -663,7 +663,7 @@ const handleOpenAi = async (
     });
 
     const response = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo", // Modelo mais econômico
+      model: "gpt-4o-mini", // Modelo mais econômico
       messages,
       max_completion_tokens: prompt.maxTokens,
       temperature: prompt.temperature
