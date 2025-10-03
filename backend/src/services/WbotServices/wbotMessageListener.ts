@@ -562,7 +562,7 @@ const verifyQuotedMessage = async (
 
 const sanitizeName = (name: string): string => {
   let sanitized = name.split(" ")[0];
-  sanitized = sanitized.replace(/[^a-zA-Z0-9]/g, "");
+  sanitized = sanitized.replace(/[^\p{L}\p{N}]/gu, "");
   return sanitized.substring(0, 60);
 };
 const convertTextToSpeechAndSaveToFile = (
@@ -640,7 +640,17 @@ const handleOpenAi = async (
   mediaSent: Message | undefined
 ): Promise<void> => {
   const bodyMessage = getBodyMessage(msg);
-  if (!bodyMessage || msg.messageStubType) return;
+
+  if (msg.messageStubType) return;
+
+  const hasMedia =
+    msg.message?.imageMessage ||
+    msg.message?.videoMessage ||
+    msg.message?.audioMessage ||
+    msg.message?.documentMessage ||
+    msg.message?.stickerMessage;
+
+  if (!bodyMessage && !hasMedia) return;
 
   // Configuração inicial
   const prompt = await getPromptConfiguration(wbot.id, ticket);
@@ -661,6 +671,8 @@ const handleOpenAi = async (
       userMessage,
       contactName: contact.name
     });
+
+    console.log(messages);
 
     const response = await openai.chat.completions.create({
       model: "gpt-4o-mini", // Modelo mais econômico
@@ -701,7 +713,12 @@ const initializeOpenAiSession = async (sessionId: number, apiKey: string) => {
 
 const getMessageHistory = async (ticketId: number, limit: number) => {
   return Message.findAll({
-    where: { ticketId, mediaType: "extendedTextMessage" },
+    where: {
+      ticketId,
+      mediaType: {
+        [Op.or]: ["extendedTextMessage", "image", "audio", "video", "text"]
+      }
+    },
     order: [["createdAt", "ASC"]],
     limit
   });
@@ -715,6 +732,37 @@ const extractUserMessage = async (
   // Mensagem de texto
   if (msg.message?.conversation || msg.message?.extendedTextMessage?.text) {
     return msg.message?.conversation || msg.message?.extendedTextMessage?.text;
+  }
+
+  // Mensagem de imagem (com ou sem legenda)
+  if (msg.message?.imageMessage) {
+    const caption = msg.message.imageMessage.caption;
+    if (caption) {
+      return caption;
+    } else {
+      return "O usuário enviou uma imagem";
+    }
+  }
+
+  // Mensagem de vídeo (com ou sem legenda)
+  if (msg.message?.videoMessage) {
+    const caption = msg.message.videoMessage.caption;
+    if (caption) {
+      return caption;
+    } else {
+      return "O usuário enviou um vídeo";
+    }
+  }
+
+  // Mensagem de documento (com ou sem legenda)
+  if (msg.message?.documentMessage) {
+    const caption = msg.message.documentMessage.caption;
+    const fileName = msg.message.documentMessage.fileName || "documento";
+    if (caption) {
+      return `${caption} (arquivo: ${fileName})`;
+    } else {
+      return `O usuário enviou um documento: ${fileName}`;
+    }
   }
 
   // Mensagem de áudio
@@ -738,6 +786,11 @@ const extractUserMessage = async (
     }
   }
 
+  // Mensagem de sticker
+  if (msg.message?.stickerMessage) {
+    return "O usuário enviou um sticker";
+  }
+
   return null;
 };
 
@@ -752,29 +805,40 @@ const buildMessageArray = ({
   userMessage: string;
   contactName: string;
 }): OpenAI.Chat.Completions.ChatCompletionMessageParam[] => {
-  const systemMessage: OpenAI.Chat.Completions.ChatCompletionSystemMessageParam =
-    {
-      role: "system",
-      content: `O nome do cliente é ${sanitizeName(
-        contactName || "Não informado"
-      )}, o atendimento é pelo WhatsApp.
-    - Cuide para não truncar o final das respostas. \n
-    - IMPORTANTE: Para transferir o atendimento a um humano/atendente inicie a resposta com exatamente: 'Ação: Transferir para o setor de atendimento' \n\n
-    Prompt: \n
+  const systemMessage = {
+    role: "system" as const,
+    content: `O nome do cliente é ${sanitizeName(
+      contactName || "Não informado"
+    )}.
+    - IMPORTANTE: Para transferir o atendimento a um humano/atendente inicie a resposta com exatamente: 'Ação: Transferir para o setor de atendimento'
+    Instruções:
     ${systemPrompt.prompt}`
-    };
+  };
+
+  function getMessageContent(msg: Message): string {
+    switch (msg.mediaType) {
+      case "extendedTextMessage":
+        return msg.body;
+      case "image":
+        return `O usuário enviou uma imagem: ${msg.body}`;
+      case "video":
+        return `O usuário enviou um vídeo: ${msg.body}`;
+      case "audio":
+        return `O usuário enviou um áudio: ${msg.body}`;
+      case "text":
+        return `O usuário enviou um documento: ${msg.body}`;
+      default:
+        return `O usuário enviou uma mensagem de ${msg.mediaType}: ${msg.body}`;
+    }
+  }
 
   const processedHistory: OpenAI.Chat.Completions.ChatCompletionMessageParam[] =
     messageHistory.map(msg => ({
       role: msg.fromMe ? "assistant" : "user",
-      content: msg.body
+      content: getMessageContent(msg)
     }));
 
-  return [
-    systemMessage,
-    ...processedHistory,
-    { role: "user", content: userMessage }
-  ];
+  return [systemMessage, ...processedHistory];
 };
 
 const handleAiResponse = async (
@@ -787,6 +851,7 @@ const handleAiResponse = async (
     originalMsg: proto.IWebMessageInfo;
   }
 ) => {
+  logger.info(`Resposta AI: ${response}`);
   if (!response) return;
 
   let cleanedResponse = response;
@@ -800,7 +865,12 @@ const handleAiResponse = async (
     });
     cleanedResponse = response
       .replace("Ação: Transferir para o setor de atendimento", "")
+      .split(/\r?\n/)
+      .map(line => line.trim())
+      .filter(line => !/^[\.\*]+$/.test(line))
+      .join("\n")
       .trim();
+
     if (!cleanedResponse)
       cleanedResponse = "Um atendente irá lhe atender em breve.";
   }
