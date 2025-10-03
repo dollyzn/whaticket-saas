@@ -672,8 +672,6 @@ const handleOpenAi = async (
       contactName: contact.name
     });
 
-    console.log(messages);
-
     const response = await openai.chat.completions.create({
       model: "gpt-4o-mini", // Modelo mais econômico
       messages,
@@ -712,16 +710,17 @@ const initializeOpenAiSession = async (sessionId: number, apiKey: string) => {
 };
 
 const getMessageHistory = async (ticketId: number, limit: number) => {
-  return Message.findAll({
+  const messages = await Message.findAll({
     where: {
       ticketId,
       mediaType: {
         [Op.or]: ["extendedTextMessage", "image", "audio", "video", "text"]
       }
     },
-    order: [["createdAt", "ASC"]],
+    order: [["createdAt", "DESC"]],
     limit
   });
+  return messages.reverse();
 };
 
 const extractUserMessage = async (
@@ -779,6 +778,9 @@ const extractUserMessage = async (
         model: "whisper-1"
       });
 
+      mediaSent.body = transcription.text;
+      await mediaSent.save();
+
       return transcription.text;
     } catch (error) {
       console.error("Erro na transcrição de áudio:", error);
@@ -824,21 +826,27 @@ const buildMessageArray = ({
       case "video":
         return `O usuário enviou um vídeo: ${msg.body}`;
       case "audio":
-        return `O usuário enviou um áudio: ${msg.body}`;
+        return msg.body === "Áudio"
+          ? `O usuário enviou um áudio: ${msg.body}`
+          : msg.body;
       case "text":
         return `O usuário enviou um documento: ${msg.body}`;
       default:
-        return `O usuário enviou uma mensagem de ${msg.mediaType}: ${msg.body}`;
+        return msg.body;
     }
   }
 
   const processedHistory: OpenAI.Chat.Completions.ChatCompletionMessageParam[] =
-    messageHistory.map(msg => ({
+    messageHistory.slice(0, -1).map(msg => ({
       role: msg.fromMe ? "assistant" : "user",
       content: getMessageContent(msg)
     }));
 
-  return [systemMessage, ...processedHistory];
+  return [
+    systemMessage,
+    ...processedHistory,
+    { role: "user", content: userMessage }
+  ];
 };
 
 const handleAiResponse = async (
