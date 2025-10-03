@@ -801,6 +801,8 @@ const handleAiResponse = async (
     cleanedResponse = response
       .replace("Ação: Transferir para o setor de atendimento", "")
       .trim();
+    if (!cleanedResponse)
+      cleanedResponse = "Um atendente irá lhe atender em breve.";
   }
 
   // Enviar resposta
