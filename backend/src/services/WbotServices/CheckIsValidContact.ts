@@ -1,7 +1,6 @@
 import AppError from "../../errors/AppError";
 import GetDefaultWhatsApp from "../../helpers/GetDefaultWhatsApp";
 import { getWbot } from "../../libs/wbot";
-import { isPnUser, getContactIdentifiers } from "../../helpers/LidPnMapping";
 
 const CheckIsValidContact = async (
   number: string,

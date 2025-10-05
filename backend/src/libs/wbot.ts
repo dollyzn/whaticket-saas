@@ -5,8 +5,7 @@ import makeWASocket, {
   DisconnectReason,
   fetchLatestBaileysVersion,
   makeCacheableSignalKeyStore,
-  isJidBroadcast,
-  CacheStore
+  isJidBroadcast
 } from "baileys";
 
 import Whatsapp from "../models/Whatsapp";
@@ -88,7 +87,6 @@ export const initWASocket = async (whatsapp: Whatsapp): Promise<Session> => {
         const { state, saveState } = await authState(whatsapp);
 
         const msgRetryCounterCache = new NodeCache();
-        const userDevicesCache: CacheStore = new NodeCache();
 
         wsocket = makeWASocket({
           logger: loggerBaileys,

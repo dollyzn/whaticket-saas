@@ -2,8 +2,13 @@ import { getIO } from "../../libs/socket";
 import Contact from "../../models/Contact";
 import ContactCustomField from "../../models/ContactCustomField";
 import { isNil } from "lodash";
-import { getContactIdentifiers } from "../../helpers/LidPnMapping";
-import { jidNormalizedUser, WASocket } from "baileys";
+import {
+  getSenderLid,
+  jidNormalizedUser,
+  toJid,
+  WAMessage,
+  WASocket
+} from "baileys";
 import { logger } from "../../utils/logger";
 import { Op } from "sequelize";
 interface ExtraInfo extends ContactCustomField {
@@ -20,7 +25,7 @@ interface Request {
   companyId: number;
   extraInfo?: ExtraInfo[];
   whatsappId?: number;
-  wbot?: WASocket; // For LID/PN mapping
+  msg?: WAMessage;
 }
 
 const CreateOrUpdateContactService = async ({
@@ -32,24 +37,19 @@ const CreateOrUpdateContactService = async ({
   companyId,
   extraInfo = [],
   whatsappId,
-  wbot
+  msg
 }: Request): Promise<Contact> => {
   const cleanNumber = number.replace(/\D/g, "");
   const normalizedJid = jidNormalizedUser(number);
+  const senderLid = msg
+    ? getSenderLid(msg)
+    : { lid: undefined, jid: undefined };
 
-  let contactIdentifiers: {
-    contactId: string;
-    lid?: string;
-    phoneNumber?: string;
-  } = { contactId: normalizedJid };
-
-  if (wbot && !isGroup) {
-    try {
-      contactIdentifiers = await getContactIdentifiers(wbot, normalizedJid);
-    } catch (error) {
-      logger.error("Error getting contact identifiers:", error);
-    }
-  }
+  const contactIdentifiers = {
+    contactId: normalizedJid,
+    lid: senderLid.lid,
+    phoneNumber: senderLid.jid.replace(/\D/g, "")
+  };
 
   const io = getIO();
   let contact: Contact | null;

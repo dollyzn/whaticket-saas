@@ -60,7 +60,6 @@ import QueueIntegrations from "../../models/QueueIntegrations";
 import ShowQueueIntegrationService from "../QueueIntegrationServices/ShowQueueIntegrationService";
 import { randomBytes } from "crypto";
 import PQueue from "p-queue";
-import { storeLidPnMapping } from "../../helpers/LidPnMapping";
 import * as fs from "fs";
 import Prompt from "../../models/Prompt";
 
@@ -300,15 +299,11 @@ export function makeid(length) {
 }
 
 const getBodyButton = (msg: proto.IWebMessageInfo): string => {
-  if (
-    msg.key.fromMe &&
-    msg?.message?.viewOnceMessage?.message?.buttonsMessage?.contentText
-  ) {
-    let bodyMessage = `*${msg?.message?.viewOnceMessage?.message?.buttonsMessage?.contentText}*`;
+  if (msg.key.fromMe && msg?.message?.buttonsMessage?.contentText) {
+    let bodyMessage = `${msg?.message?.buttonsMessage?.contentText}\n\n`;
 
-    for (const buton of msg.message?.viewOnceMessage?.message?.buttonsMessage
-      ?.buttons) {
-      bodyMessage += `\n\n${buton.buttonText?.displayText}`;
+    for (const buton of msg.message?.buttonsMessage?.buttons) {
+      bodyMessage += `*[ ${buton.buttonId} ]* - ${buton.buttonText?.displayText}\n`;
     }
     return bodyMessage;
   }
@@ -337,7 +332,7 @@ const msgLocation = (image, latitude, longitude) => {
 
 export const getBodyMessage = (msg: proto.IWebMessageInfo): string | null => {
   try {
-    let type = getTypeMessage(msg);
+    const type = getTypeMessage(msg);
 
     const types = {
       conversation: msg?.message?.conversation,
@@ -518,7 +513,8 @@ const downloadMedia = async (msg: proto.IWebMessageInfo) => {
 const verifyContact = async (
   msgContact: IMe,
   wbot: Session,
-  companyId: number
+  companyId: number,
+  msg: WAMessage
 ): Promise<Contact> => {
   let profilePicUrl: string;
   try {
@@ -535,7 +531,7 @@ const verifyContact = async (
     isGroup: msgContact.id.includes("g.us"),
     companyId,
     whatsappId: wbot.id,
-    wbot // Pass wbot for LID/PN mapping
+    msg
   };
 
   const contact = CreateOrUpdateContactService(contactData);
@@ -1246,6 +1242,30 @@ const verifyQueue = async (
     await verifyMessage(sendMsg, ticket, ticket.contact);
   };
 
+  const botButton = async () => {
+    const buttons = [];
+    queues.forEach((queue, i) => {
+      buttons.push({
+        buttonId: `${i + 1}`,
+        buttonText: { displayText: queue.name },
+        type: 1
+      });
+    });
+
+    const buttonMessage = {
+      text: formatBody(`\u200e${greetingMessage}`, contact),
+      buttons,
+      headerType: 1
+    };
+
+    const sendMsg = await wbot.sendMessage(
+      `${ticket.contact.number}@${ticket.isGroup ? "g.us" : "s.whatsapp.net"}`,
+      buttonMessage
+    );
+
+    await verifyMessage(sendMsg, ticket, ticket.contact);
+  };
+
   if (choosenQueue) {
     let chatbot = false;
     if (choosenQueue?.options) {
@@ -1399,6 +1419,10 @@ const verifyQueue = async (
     await ticketTraking.update({
       chatbotAt: null
     });
+
+    if (buttonActive.value === "button") {
+      return queues.length <= 4 ? botButton() : botText();
+    }
 
     if (buttonActive.value === "text") {
       return botText();
@@ -1838,7 +1862,8 @@ export const handleMessageIntegration = async (
     const contact = await verifyContact(
       msgContact,
       wbot,
-      queueIntegration.companyId
+      queueIntegration.companyId,
+      msg
     );
 
     let inputAudio: string | undefined;
@@ -2100,11 +2125,11 @@ const handleMessage = async (
         id: grupoMeta.id,
         name: grupoMeta.subject
       };
-      groupContact = await verifyContact(msgGroupContact, wbot, companyId);
+      groupContact = await verifyContact(msgGroupContact, wbot, companyId, msg);
     }
 
     const whatsapp = await ShowWhatsAppService(wbot.id!, companyId);
-    const contact = await verifyContact(msgContact, wbot, companyId);
+    const contact = await verifyContact(msgContact, wbot, companyId, msg);
 
     if (contact.ignoreMessages) {
       return;
@@ -2664,48 +2689,48 @@ const wbotMessageListener = async (
     });
 
     // Handler for LID mapping updates (Baileys 7.x.x)
-    wbot.ev.on("lid-mapping.update", async lidMappingUpdate => {
-      try {
-        logger.info(
-          `LID mapping update received for company ${companyId}:`,
-          lidMappingUpdate
-        );
+    // wbot.ev.on("lid-mapping.update", async lidMappingUpdate => {
+    //   try {
+    //     logger.info(
+    //       `LID mapping update received for company ${companyId}:`,
+    //       lidMappingUpdate
+    //     );
 
-        // Store the LID/PN mapping if available
-        if (lidMappingUpdate.lid && lidMappingUpdate.pn) {
-          await storeLidPnMapping(wbot, {
-            lid: lidMappingUpdate.lid,
-            phoneNumber: lidMappingUpdate.pn
-          });
+    //     // Store the LID/PN mapping if available
+    //     if (lidMappingUpdate.lid && lidMappingUpdate.pn) {
+    //       await storeLidPnMapping(wbot, {
+    //         lid: lidMappingUpdate.lid,
+    //         phoneNumber: lidMappingUpdate.pn
+    //       });
 
-          // Update existing contacts with the new mapping
-          try {
-            const phoneNumber = lidMappingUpdate.pn.replace(/\D/g, "");
-            await Contact.update(
-              {
-                contactId: lidMappingUpdate.lid,
-                lid: lidMappingUpdate.lid,
-                phoneNumber: phoneNumber
-              },
-              {
-                where: {
-                  number: phoneNumber,
-                  companyId: companyId
-                }
-              }
-            );
-            logger.info(
-              `Updated contact with LID mapping: ${lidMappingUpdate.lid} <-> ${phoneNumber}`
-            );
-          } catch (error) {
-            logger.error("Error updating contact with LID mapping:", error);
-          }
-        }
-      } catch (error) {
-        logger.error("Error handling LID mapping update:", error);
-        Sentry.captureException(error);
-      }
-    });
+    //       // Update existing contacts with the new mapping
+    //       try {
+    //         const phoneNumber = lidMappingUpdate.pn.replace(/\D/g, "");
+    //         await Contact.update(
+    //           {
+    //             contactId: lidMappingUpdate.lid,
+    //             lid: lidMappingUpdate.lid,
+    //             phoneNumber: phoneNumber
+    //           },
+    //           {
+    //             where: {
+    //               number: phoneNumber,
+    //               companyId: companyId
+    //             }
+    //           }
+    //         );
+    //         logger.info(
+    //           `Updated contact with LID mapping: ${lidMappingUpdate.lid} <-> ${phoneNumber}`
+    //         );
+    //       } catch (error) {
+    //         logger.error("Error updating contact with LID mapping:", error);
+    //       }
+    //     }
+    //   } catch (error) {
+    //     logger.error("Error handling LID mapping update:", error);
+    //     Sentry.captureException(error);
+    //   }
+    // });
 
     // wbot.ev.on("messages.set", async (messageSet: IMessage) => {
     //   messageSet.messages.filter(filterMessages).map(msg => msg);

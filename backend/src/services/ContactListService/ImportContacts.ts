@@ -65,7 +65,7 @@ export async function ImportContacts(
     for (let newContact of contactList) {
       try {
         const response = await CheckContactNumber(newContact.number, companyId);
-        newContact.isWhatsappValid = response.exists;
+        newContact.isWhatsappValid = !!response.exists;
         const number = response.jid.replace(/\D/g, "");
         newContact.number = number;
         await newContact.save();
