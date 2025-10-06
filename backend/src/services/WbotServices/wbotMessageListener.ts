@@ -836,7 +836,7 @@ const buildMessageArray = ({
   const processedHistory: OpenAI.Chat.Completions.ChatCompletionMessageParam[] =
     messageHistory.slice(0, -1).map(msg => ({
       role: msg.fromMe ? "assistant" : "user",
-      content: getMessageContent(msg)
+      content: getMessageContent(msg).replace(`*${systemPrompt.name}:*`, "")
     }));
 
   return [
@@ -859,7 +859,7 @@ const handleAiResponse = async (
   logger.info(`Resposta AI: ${response}`);
   if (!response) return;
 
-  let cleanedResponse = response;
+  let cleanedResponse = response.trim();
 
   // Processar transferência de fila
   if (response.includes("Ação: Transferir para o setor de atendimento")) {
