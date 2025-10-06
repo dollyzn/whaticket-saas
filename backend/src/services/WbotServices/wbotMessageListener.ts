@@ -1259,6 +1259,7 @@ const verifyQueue = async (
 
     const buttonMessage = {
       text: formatBody(`\u200e${greetingMessage}`, contact),
+      footer: "Selecione uma das opções abaixo",
       buttons,
       headerType: 1
     };
