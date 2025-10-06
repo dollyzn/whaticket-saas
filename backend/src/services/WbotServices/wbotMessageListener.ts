@@ -997,7 +997,7 @@ const verifyMediaMessage = async (
     mediaUrl: media.filename,
     mediaType: media.mimetype.split("/")[0],
     quotedMsgId: quotedMsg?.id,
-    ack: msg.status,
+    ack: msg.status ?? 0,
     remoteJid: msg.key.remoteJid,
     participant: msg.key.participant,
     dataJson: JSON.stringify(msg)
@@ -1061,7 +1061,7 @@ export const verifyMessage = async (
     mediaType: getTypeMessage(msg),
     read: msg.key.fromMe,
     quotedMsgId: quotedMsg?.id,
-    ack: msg.status,
+    ack: msg.status ?? 0,
     remoteJid: msg.key.remoteJid,
     participant: msg.key.participant,
     dataJson: JSON.stringify(msg),
@@ -2469,7 +2469,7 @@ const handleMsgAck = async (
       ]
     });
 
-    if (!messageToUpdate) return;
+    if (!messageToUpdate || isNil(chat)) return;
     await messageToUpdate.update({ ack: chat });
     io.to(messageToUpdate.ticketId.toString()).emit(
       `company-${messageToUpdate.companyId}-appMessage`,

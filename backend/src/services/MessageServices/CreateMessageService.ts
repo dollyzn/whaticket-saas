@@ -24,7 +24,11 @@ const CreateMessageService = async ({
   messageData,
   companyId
 }: Request): Promise<Message> => {
-  await Message.upsert({ ...messageData, companyId });
+  await Message.upsert({
+    ...messageData,
+    ack: messageData.ack ?? 0,
+    companyId
+  });
 
   const message = await Message.findByPk(messageData.id, {
     include: [
