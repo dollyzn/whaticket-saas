@@ -5,7 +5,8 @@ import makeWASocket, {
   DisconnectReason,
   fetchLatestBaileysVersion,
   makeCacheableSignalKeyStore,
-  isJidBroadcast
+  isJidBroadcast,
+  isJidNewsletter
 } from "baileys";
 
 import Whatsapp from "../models/Whatsapp";
@@ -98,7 +99,7 @@ export const initWASocket = async (whatsapp: Whatsapp): Promise<Session> => {
           },
           version: [2, 3000, 1023223821],
           msgRetryCounterCache,
-          shouldIgnoreJid: jid => isJidBroadcast(jid)
+          shouldIgnoreJid: jid => isJidBroadcast(jid) || isJidNewsletter(jid)
         });
 
         wsocket.ev.on(
