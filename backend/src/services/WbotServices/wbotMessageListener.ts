@@ -880,11 +880,15 @@ const handleAiResponse = async (
       cleanedResponse = "Um atendente irá lhe atender em breve.";
   }
 
+  const signedMessage = context.prompt.name
+    ? `*${context.prompt.name}:*\n\n${cleanedResponse}`
+    : cleanedResponse;
+
   // Enviar resposta
   if (context.prompt.voice === "texto") {
-    await sendTextResponse(cleanedResponse, context);
+    await sendTextResponse(signedMessage, context);
   } else {
-    await sendAudioResponse(cleanedResponse, context);
+    await sendAudioResponse(signedMessage, context);
   }
 };
 
