@@ -1426,7 +1426,7 @@ const verifyQueue = async (
     });
 
     if (buttonActive.value === "button") {
-      return queues.length <= 4 ? botButton() : botText();
+      return queues.length <= 5 ? botButton() : botText();
     }
 
     if (buttonActive.value === "text") {
