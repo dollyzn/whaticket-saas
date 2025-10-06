@@ -18,6 +18,7 @@ import puppeteer from "puppeteer";
 import axios from "axios";
 import UpdateTicketService from "../TicketServices/UpdateTicketService";
 import fs from "fs";
+import getContactId from "../../utils/GetContactId";
 
 export const provider = async (
   ticket: Ticket,
@@ -106,9 +107,7 @@ export const provider = async (
             try {
               await sleep(2000);
               await wbot.sendMessage(
-                `${ticket.contact.number}@${
-                  ticket.isGroup ? "g.us" : "s.whatsapp.net"
-                }`,
+                getContactId(ticket.contact, ticket.isGroup),
                 textMessage
               );
             } catch (error) {}
@@ -144,9 +143,7 @@ export const provider = async (
                       try {
                         await sleep(2000);
                         await wbot.sendMessage(
-                          `${ticket.contact.number}@${
-                            ticket.isGroup ? "g.us" : "s.whatsapp.net"
-                          }`,
+                          getContactId(ticket.contact, ticket.isGroup),
                           textMessage
                         );
                       } catch (error) {
@@ -201,9 +198,7 @@ export const provider = async (
                           )
                         };
                         await wbot.sendMessage(
-                          `${ticket.contact.number}@${
-                            ticket.isGroup ? "g.us" : "s.whatsapp.net"
-                          }`,
+                          getContactId(ticket.contact, ticket.isGroup),
                           textMessage
                         );
                         const bodyBoleto = {
@@ -214,9 +209,7 @@ export const provider = async (
                         };
                         await sleep(2000);
                         await wbot.sendMessage(
-                          `${ticket.contact.number}@${
-                            ticket.isGroup ? "g.us" : "s.whatsapp.net"
-                          }`,
+                          getContactId(ticket.contact, ticket.isGroup),
                           bodyBoleto
                         );
                         const bodyLinha = {
@@ -224,9 +217,7 @@ export const provider = async (
                         };
                         await sleep(2000);
                         await wbot.sendMessage(
-                          `${ticket.contact.number}@${
-                            ticket.isGroup ? "g.us" : "s.whatsapp.net"
-                          }`,
+                          getContactId(ticket.contact, ticket.isGroup),
                           bodyLinha
                         );
                         if (qrcode !== null) {
@@ -238,9 +229,7 @@ export const provider = async (
                           };
                           await sleep(2000);
                           await wbot.sendMessage(
-                            `${ticket.contact.number}@${
-                              ticket.isGroup ? "g.us" : "s.whatsapp.net"
-                            }`,
+                            getContactId(ticket.contact, ticket.isGroup),
                             bodyPdf
                           );
                           const bodyqrcode = {
@@ -248,9 +237,7 @@ export const provider = async (
                           };
                           await sleep(2000);
                           await wbot.sendMessage(
-                            `${ticket.contact.number}@${
-                              ticket.isGroup ? "g.us" : "s.whatsapp.net"
-                            }`,
+                            getContactId(ticket.contact, ticket.isGroup),
                             bodyqrcode
                           );
                           let linkBoleto = `https://chart.googleapis.com/chart?cht=qr&chs=500x500&chld=L|0&chl=${qrcode}`;
@@ -274,9 +261,7 @@ export const provider = async (
                           text: formatBody(`${bodyPdf}`, contact)
                         };
                         await wbot.sendMessage(
-                          `${ticket.contact.number}@${
-                            ticket.isGroup ? "g.us" : "s.whatsapp.net"
-                          }`,
+                          getContactId(ticket.contact, ticket.isGroup),
                           bodyPdfQr
                         );
                         await sleep(2000);
@@ -319,9 +304,7 @@ export const provider = async (
                           };
                           await sleep(2000);
                           await wbot.sendMessage(
-                            `${ticket.contact.number}@${
-                              ticket.isGroup ? "g.us" : "s.whatsapp.net"
-                            }`,
+                            getContactId(ticket.contact, ticket.isGroup),
                             bodyBloqueio
                           );
                           const bodyqrcode = {
@@ -332,9 +315,7 @@ export const provider = async (
                           };
                           await sleep(2000);
                           await wbot.sendMessage(
-                            `${ticket.contact.number}@${
-                              ticket.isGroup ? "g.us" : "s.whatsapp.net"
-                            }`,
+                            getContactId(ticket.contact, ticket.isGroup),
                             bodyqrcode
                           );
                           var optionsdesbloq = {
@@ -355,9 +336,7 @@ export const provider = async (
                               };
                               await sleep(2000);
                               await wbot.sendMessage(
-                                `${ticket.contact.number}@${
-                                  ticket.isGroup ? "g.us" : "s.whatsapp.net"
-                                }`,
+                                getContactId(ticket.contact, ticket.isGroup),
                                 bodyLiberado
                               );
                               const bodyqrcode = {
@@ -368,9 +347,7 @@ export const provider = async (
                               };
                               await sleep(2000);
                               await wbot.sendMessage(
-                                `${ticket.contact.number}@${
-                                  ticket.isGroup ? "g.us" : "s.whatsapp.net"
-                                }`,
+                                getContactId(ticket.contact, ticket.isGroup),
                                 bodyqrcode
                               );
                             })
@@ -382,9 +359,7 @@ export const provider = async (
                                 )
                               };
                               await wbot.sendMessage(
-                                `${ticket.contact.number}@${
-                                  ticket.isGroup ? "g.us" : "s.whatsapp.net"
-                                }`,
+                                getContactId(ticket.contact, ticket.isGroup),
                                 bodyfinaliza
                               );
                             });
@@ -398,9 +373,7 @@ export const provider = async (
                         };
                         await sleep(12000);
                         await wbot.sendMessage(
-                          `${ticket.contact.number}@${
-                            ticket.isGroup ? "g.us" : "s.whatsapp.net"
-                          }`,
+                          getContactId(ticket.contact, ticket.isGroup),
                           bodyfinaliza
                         );
 
@@ -430,9 +403,7 @@ export const provider = async (
                       };
                       await sleep(2000);
                       await wbot.sendMessage(
-                        `${ticket.contact.number}@${
-                          ticket.isGroup ? "g.us" : "s.whatsapp.net"
-                        }`,
+                        getContactId(ticket.contact, ticket.isGroup),
                         bodyBoleto
                       );
                     } catch (error) {
@@ -448,9 +419,7 @@ export const provider = async (
                   )
                 };
                 await wbot.sendMessage(
-                  `${ticket.contact.number}@${
-                    ticket.isGroup ? "g.us" : "s.whatsapp.net"
-                  }`,
+                  getContactId(ticket.contact, ticket.isGroup),
                   bodyfinaliza
                 );
               });
@@ -463,9 +432,7 @@ export const provider = async (
             };
             await sleep(2000);
             await wbot.sendMessage(
-              `${ticket.contact.number}@${
-                ticket.isGroup ? "g.us" : "s.whatsapp.net"
-              }`,
+              getContactId(ticket.contact, ticket.isGroup),
               body
             );
           }
@@ -487,9 +454,7 @@ export const provider = async (
             try {
               await sleep(2000);
               await wbot.sendMessage(
-                `${ticket.contact.number}@${
-                  ticket.isGroup ? "g.us" : "s.whatsapp.net"
-                }`,
+                getContactId(ticket.contact, ticket.isGroup),
                 body
               );
             } catch (error) {}
@@ -523,9 +488,7 @@ export const provider = async (
                   };
                   await sleep(2000);
                   await wbot.sendMessage(
-                    `${ticket.contact.number}@${
-                      ticket.isGroup ? "g.us" : "s.whatsapp.net"
-                    }`,
+                    getContactId(ticket.contact, ticket.isGroup),
                     body
                   );
                 } else {
@@ -537,9 +500,7 @@ export const provider = async (
                   };
                   await sleep(2000);
                   await wbot.sendMessage(
-                    `${ticket.contact.number}@${
-                      ticket.isGroup ? "g.us" : "s.whatsapp.net"
-                    }`,
+                    getContactId(ticket.contact, ticket.isGroup),
                     body
                   );
                   var optionsListpaymentOVERDUE = {
@@ -567,9 +528,7 @@ export const provider = async (
                         };
                         await sleep(2000);
                         await wbot.sendMessage(
-                          `${ticket.contact.number}@${
-                            ticket.isGroup ? "g.us" : "s.whatsapp.net"
-                          }`,
+                          getContactId(ticket.contact, ticket.isGroup),
                           body
                         );
                         var optionsPENDING = {
@@ -626,9 +585,7 @@ export const provider = async (
                             };
                             await sleep(2000);
                             await wbot.sendMessage(
-                              `${ticket.contact.number}@${
-                                ticket.isGroup ? "g.us" : "s.whatsapp.net"
-                              }`,
+                              getContactId(ticket.contact, ticket.isGroup),
                               bodyBoleto
                             );
                             //GET DADOS PIX
@@ -659,9 +616,10 @@ export const provider = async (
                                   };
                                   await sleep(2000);
                                   await wbot.sendMessage(
-                                    `${ticket.contact.number}@${
-                                      ticket.isGroup ? "g.us" : "s.whatsapp.net"
-                                    }`,
+                                    getContactId(
+                                      ticket.contact,
+                                      ticket.isGroup
+                                    ),
                                     bodyPixCP
                                   );
                                   const bodyPix = {
@@ -669,9 +627,10 @@ export const provider = async (
                                   };
                                   await sleep(2000);
                                   await wbot.sendMessage(
-                                    `${ticket.contact.number}@${
-                                      ticket.isGroup ? "g.us" : "s.whatsapp.net"
-                                    }`,
+                                    getContactId(
+                                      ticket.contact,
+                                      ticket.isGroup
+                                    ),
                                     bodyPix
                                   );
                                   let linkBoleto = `https://chart.googleapis.com/chart?cht=qr&chs=500x500&chld=L|0&chl=${payload}`;
@@ -716,20 +675,18 @@ export const provider = async (
                                         };
                                         await sleep(2000);
                                         await wbot.sendMessage(
-                                          `${ticket.contact.number}@${
+                                          getContactId(
+                                            ticket.contact,
                                             ticket.isGroup
-                                              ? "g.us"
-                                              : "s.whatsapp.net"
-                                          }`,
+                                          ),
                                           bodycodigo
                                         );
                                         await sleep(2000);
                                         await wbot.sendMessage(
-                                          `${ticket.contact.number}@${
+                                          getContactId(
+                                            ticket.contact,
                                             ticket.isGroup
-                                              ? "g.us"
-                                              : "s.whatsapp.net"
-                                          }`,
+                                          ),
                                           bodycodigoBarras
                                         );
                                         const bodyfinaliza = {
@@ -740,11 +697,10 @@ export const provider = async (
                                         };
                                         await sleep(2000);
                                         await wbot.sendMessage(
-                                          `${ticket.contact.number}@${
+                                          getContactId(
+                                            ticket.contact,
                                             ticket.isGroup
-                                              ? "g.us"
-                                              : "s.whatsapp.net"
-                                          }`,
+                                          ),
                                           bodyfinaliza
                                         );
                                         await sleep(2000);
@@ -762,11 +718,10 @@ export const provider = async (
                                         };
                                         await sleep(2000);
                                         await wbot.sendMessage(
-                                          `${ticket.contact.number}@${
+                                          getContactId(
+                                            ticket.contact,
                                             ticket.isGroup
-                                              ? "g.us"
-                                              : "s.whatsapp.net"
-                                          }`,
+                                          ),
                                           bodyfinaliza
                                         );
                                         await UpdateTicketService({
@@ -785,11 +740,10 @@ export const provider = async (
                                       };
                                       await sleep(2000);
                                       await wbot.sendMessage(
-                                        `${ticket.contact.number}@${
+                                        getContactId(
+                                          ticket.contact,
                                           ticket.isGroup
-                                            ? "g.us"
-                                            : "s.whatsapp.net"
-                                        }`,
+                                        ),
                                         bodyfinaliza
                                       );
                                       await UpdateTicketService({
@@ -809,9 +763,7 @@ export const provider = async (
                                 };
                                 await sleep(2000);
                                 await wbot.sendMessage(
-                                  `${ticket.contact.number}@${
-                                    ticket.isGroup ? "g.us" : "s.whatsapp.net"
-                                  }`,
+                                  getContactId(ticket.contact, ticket.isGroup),
                                   body
                                 );
                               });
@@ -825,9 +777,7 @@ export const provider = async (
                             };
                             await sleep(2000);
                             await wbot.sendMessage(
-                              `${ticket.contact.number}@${
-                                ticket.isGroup ? "g.us" : "s.whatsapp.net"
-                              }`,
+                              getContactId(ticket.contact, ticket.isGroup),
                               body
                             );
                           });
@@ -868,9 +818,7 @@ export const provider = async (
                         };
                         await sleep(2000);
                         await wbot.sendMessage(
-                          `${ticket.contact.number}@${
-                            ticket.isGroup ? "g.us" : "s.whatsapp.net"
-                          }`,
+                          getContactId(ticket.contact, ticket.isGroup),
                           body
                         );
                         const bodyBoleto = {
@@ -881,9 +829,7 @@ export const provider = async (
                         };
                         await sleep(2000);
                         await wbot.sendMessage(
-                          `${ticket.contact.number}@${
-                            ticket.isGroup ? "g.us" : "s.whatsapp.net"
-                          }`,
+                          getContactId(ticket.contact, ticket.isGroup),
                           bodyBoleto
                         );
                         //GET DADOS PIX
@@ -913,9 +859,7 @@ export const provider = async (
                               };
                               await sleep(2000);
                               await wbot.sendMessage(
-                                `${ticket.contact.number}@${
-                                  ticket.isGroup ? "g.us" : "s.whatsapp.net"
-                                }`,
+                                getContactId(ticket.contact, ticket.isGroup),
                                 bodyPixCP
                               );
                               const bodyPix = {
@@ -923,9 +867,7 @@ export const provider = async (
                               };
                               await sleep(2000);
                               await wbot.sendMessage(
-                                `${ticket.contact.number}@${
-                                  ticket.isGroup ? "g.us" : "s.whatsapp.net"
-                                }`,
+                                getContactId(ticket.contact, ticket.isGroup),
                                 bodyPix
                               );
                               let linkBoleto = `https://chart.googleapis.com/chart?cht=qr&chs=500x500&chld=L|0&chl=${payload}`;
@@ -970,20 +912,18 @@ export const provider = async (
                                     };
                                     await sleep(2000);
                                     await wbot.sendMessage(
-                                      `${ticket.contact.number}@${
+                                      getContactId(
+                                        ticket.contact,
                                         ticket.isGroup
-                                          ? "g.us"
-                                          : "s.whatsapp.net"
-                                      }`,
+                                      ),
                                       bodycodigo
                                     );
                                     await sleep(2000);
                                     await wbot.sendMessage(
-                                      `${ticket.contact.number}@${
+                                      getContactId(
+                                        ticket.contact,
                                         ticket.isGroup
-                                          ? "g.us"
-                                          : "s.whatsapp.net"
-                                      }`,
+                                      ),
                                       bodycodigoBarras
                                     );
                                     const bodyfinaliza = {
@@ -994,11 +934,10 @@ export const provider = async (
                                     };
                                     await sleep(2000);
                                     await wbot.sendMessage(
-                                      `${ticket.contact.number}@${
+                                      getContactId(
+                                        ticket.contact,
                                         ticket.isGroup
-                                          ? "g.us"
-                                          : "s.whatsapp.net"
-                                      }`,
+                                      ),
                                       bodyfinaliza
                                     );
                                     await UpdateTicketService({
@@ -1015,11 +954,10 @@ export const provider = async (
                                     };
                                     await sleep(2000);
                                     await wbot.sendMessage(
-                                      `${ticket.contact.number}@${
+                                      getContactId(
+                                        ticket.contact,
                                         ticket.isGroup
-                                          ? "g.us"
-                                          : "s.whatsapp.net"
-                                      }`,
+                                      ),
                                       bodyfinaliza
                                     );
                                     await UpdateTicketService({
@@ -1046,9 +984,7 @@ export const provider = async (
                       };
                       await sleep(2000);
                       await wbot.sendMessage(
-                        `${ticket.contact.number}@${
-                          ticket.isGroup ? "g.us" : "s.whatsapp.net"
-                        }`,
+                        getContactId(ticket.contact, ticket.isGroup),
                         body
                       );
                     });
@@ -1063,9 +999,7 @@ export const provider = async (
                 };
                 await sleep(2000);
                 await wbot.sendMessage(
-                  `${ticket.contact.number}@${
-                    ticket.isGroup ? "g.us" : "s.whatsapp.net"
-                  }`,
+                  getContactId(ticket.contact, ticket.isGroup),
                   body
                 );
               });
@@ -1105,9 +1039,7 @@ export const provider = async (
             try {
               await sleep(2000);
               await wbot.sendMessage(
-                `${ticket.contact.number}@${
-                  ticket.isGroup ? "g.us" : "s.whatsapp.net"
-                }`,
+                getContactId(ticket.contact, ticket.isGroup),
                 body
               );
             } catch (error) {}
@@ -1142,9 +1074,7 @@ export const provider = async (
                   };
                   await sleep(2000);
                   await wbot.sendMessage(
-                    `${ticket.contact.number}@${
-                      ticket.isGroup ? "g.us" : "s.whatsapp.net"
-                    }`,
+                    getContactId(ticket.contact, ticket.isGroup),
                     body
                   );
                 }
@@ -1158,9 +1088,7 @@ export const provider = async (
                   try {
                     await sleep(2000);
                     await wbot.sendMessage(
-                      `${ticket.contact.number}@${
-                        ticket.isGroup ? "g.us" : "s.whatsapp.net"
-                      }`,
+                      getContactId(ticket.contact, ticket.isGroup),
                       body
                     );
                   } catch (error) {}
@@ -1181,9 +1109,7 @@ export const provider = async (
                   };
                   await sleep(2000);
                   await wbot.sendMessage(
-                    `${ticket.contact.number}@${
-                      ticket.isGroup ? "g.us" : "s.whatsapp.net"
-                    }`,
+                    getContactId(ticket.contact, ticket.isGroup),
                     body
                   );
                   var boleto = {
@@ -1237,8 +1163,6 @@ export const provider = async (
                           contact
                         )
                       };
-                      //await sleep(2000)
-                      //await wbot.sendMessage(`${ticket.contact.number}@${ticket.isGroup ? "g.us" : "s.whatsapp.net"}`, bodyBoleto);
                       //LINHA DIGITAVEL
                       if (impresso !== "S") {
                         //IMPRIME BOLETO PARA GERAR CODIGO BARRAS
@@ -1294,9 +1218,7 @@ export const provider = async (
                               )
                             };
                             await wbot.sendMessage(
-                              `${ticket.contact.number}@${
-                                ticket.isGroup ? "g.us" : "s.whatsapp.net"
-                              }`,
+                              getContactId(ticket.contact, ticket.isGroup),
                               bodyBoletoPix
                             );
                             const body_linhadigitavel = {
@@ -1307,9 +1229,7 @@ export const provider = async (
                             };
                             await sleep(2000);
                             await wbot.sendMessage(
-                              `${ticket.contact.number}@${
-                                ticket.isGroup ? "g.us" : "s.whatsapp.net"
-                              }`,
+                              getContactId(ticket.contact, ticket.isGroup),
                               body_linhadigitavel
                             );
                             await sleep(2000);
@@ -1317,9 +1237,7 @@ export const provider = async (
                               text: formatBody(`${linha_digitavel}`, contact)
                             };
                             await wbot.sendMessage(
-                              `${ticket.contact.number}@${
-                                ticket.isGroup ? "g.us" : "s.whatsapp.net"
-                              }`,
+                              getContactId(ticket.contact, ticket.isGroup),
                               body_linha_digitavel
                             );
                             const body_pix = {
@@ -1330,9 +1248,7 @@ export const provider = async (
                             };
                             await sleep(2000);
                             await wbot.sendMessage(
-                              `${ticket.contact.number}@${
-                                ticket.isGroup ? "g.us" : "s.whatsapp.net"
-                              }`,
+                              getContactId(ticket.contact, ticket.isGroup),
                               body_pix
                             );
                             await sleep(2000);
@@ -1340,9 +1256,7 @@ export const provider = async (
                               text: formatBody(`${pix}`, contact)
                             };
                             await wbot.sendMessage(
-                              `${ticket.contact.number}@${
-                                ticket.isGroup ? "g.us" : "s.whatsapp.net"
-                              }`,
+                              getContactId(ticket.contact, ticket.isGroup),
                               body_pix_dig
                             );
                             const body_pixqr = {
@@ -1350,9 +1264,7 @@ export const provider = async (
                             };
                             await sleep(2000);
                             await wbot.sendMessage(
-                              `${ticket.contact.number}@${
-                                ticket.isGroup ? "g.us" : "s.whatsapp.net"
-                              }`,
+                              getContactId(ticket.contact, ticket.isGroup),
                               body_pixqr
                             );
                             let linkBoleto = `https://chart.googleapis.com/chart?cht=qr&chs=500x500&chld=L|0&chl=${pix}`;
@@ -1399,9 +1311,10 @@ export const provider = async (
                                   };
                                   await sleep(2000);
                                   await wbot.sendMessage(
-                                    `${ticket.contact.number}@${
-                                      ticket.isGroup ? "g.us" : "s.whatsapp.net"
-                                    }`,
+                                    getContactId(
+                                      ticket.contact,
+                                      ticket.isGroup
+                                    ),
                                     bodyPdf
                                   );
                                   const bodyqrcode = {
@@ -1412,9 +1325,10 @@ export const provider = async (
                                   };
                                   await sleep(2000);
                                   await wbot.sendMessage(
-                                    `${ticket.contact.number}@${
-                                      ticket.isGroup ? "g.us" : "s.whatsapp.net"
-                                    }`,
+                                    getContactId(
+                                      ticket.contact,
+                                      ticket.isGroup
+                                    ),
                                     bodyqrcode
                                   );
                                   //REALIZANDO O DESBLOQUEIO
@@ -1468,11 +1382,10 @@ export const provider = async (
                                               };
                                               await sleep(2000);
                                               await wbot.sendMessage(
-                                                `${ticket.contact.number}@${
+                                                getContactId(
+                                                  ticket.contact,
                                                   ticket.isGroup
-                                                    ? "g.us"
-                                                    : "s.whatsapp.net"
-                                                }`,
+                                                ),
                                                 body_mensagem
                                               );
                                               const bodyPdf = {
@@ -1483,11 +1396,10 @@ export const provider = async (
                                               };
                                               await sleep(2000);
                                               await wbot.sendMessage(
-                                                `${ticket.contact.number}@${
+                                                getContactId(
+                                                  ticket.contact,
                                                   ticket.isGroup
-                                                    ? "g.us"
-                                                    : "s.whatsapp.net"
-                                                }`,
+                                                ),
                                                 bodyPdf
                                               );
                                               const bodyfinaliza = {
@@ -1498,11 +1410,10 @@ export const provider = async (
                                               };
                                               await sleep(2000);
                                               await wbot.sendMessage(
-                                                `${ticket.contact.number}@${
+                                                getContactId(
+                                                  ticket.contact,
                                                   ticket.isGroup
-                                                    ? "g.us"
-                                                    : "s.whatsapp.net"
-                                                }`,
+                                                ),
                                                 bodyfinaliza
                                               );
                                               await UpdateTicketService({
@@ -1535,20 +1446,18 @@ export const provider = async (
                                         };
                                         await sleep(2000);
                                         await wbot.sendMessage(
-                                          `${ticket.contact.number}@${
+                                          getContactId(
+                                            ticket.contact,
                                             ticket.isGroup
-                                              ? "g.us"
-                                              : "s.whatsapp.net"
-                                          }`,
+                                          ),
                                           bodyerro
                                         );
                                         await sleep(2000);
                                         await wbot.sendMessage(
-                                          `${ticket.contact.number}@${
+                                          getContactId(
+                                            ticket.contact,
                                             ticket.isGroup
-                                              ? "g.us"
-                                              : "s.whatsapp.net"
-                                          }`,
+                                          ),
                                           msg_errolbieracao
                                         );
                                         const bodyerroatendent = {
@@ -1559,11 +1468,10 @@ export const provider = async (
                                         };
                                         await sleep(2000);
                                         await wbot.sendMessage(
-                                          `${ticket.contact.number}@${
+                                          getContactId(
+                                            ticket.contact,
                                             ticket.isGroup
-                                              ? "g.us"
-                                              : "s.whatsapp.net"
-                                          }`,
+                                          ),
                                           bodyerroatendent
                                         );
                                       }
@@ -1577,11 +1485,10 @@ export const provider = async (
                                       };
                                       await sleep(2000);
                                       await wbot.sendMessage(
-                                        `${ticket.contact.number}@${
+                                        getContactId(
+                                          ticket.contact,
                                           ticket.isGroup
-                                            ? "g.us"
-                                            : "s.whatsapp.net"
-                                        }`,
+                                        ),
                                         bodyerro
                                       );
                                     });
@@ -1594,9 +1501,10 @@ export const provider = async (
                                   };
                                   await sleep(8000);
                                   await wbot.sendMessage(
-                                    `${ticket.contact.number}@${
-                                      ticket.isGroup ? "g.us" : "s.whatsapp.net"
-                                    }`,
+                                    getContactId(
+                                      ticket.contact,
+                                      ticket.isGroup
+                                    ),
                                     bodyfinaliza
                                   );
                                   await UpdateTicketService({
@@ -1617,9 +1525,7 @@ export const provider = async (
                                 };
                                 await sleep(2000);
                                 await wbot.sendMessage(
-                                  `${ticket.contact.number}@${
-                                    ticket.isGroup ? "g.us" : "s.whatsapp.net"
-                                  }`,
+                                  getContactId(ticket.contact, ticket.isGroup),
                                   bodyerro
                                 );
                               });
@@ -1633,9 +1539,7 @@ export const provider = async (
                             };
                             await sleep(2000);
                             await wbot.sendMessage(
-                              `${ticket.contact.number}@${
-                                ticket.isGroup ? "g.us" : "s.whatsapp.net"
-                              }`,
+                              getContactId(ticket.contact, ticket.isGroup),
                               bodyBoleto
                             );
                             const body = {
@@ -1646,9 +1550,7 @@ export const provider = async (
                             };
                             await sleep(2000);
                             await wbot.sendMessage(
-                              `${ticket.contact.number}@${
-                                ticket.isGroup ? "g.us" : "s.whatsapp.net"
-                              }`,
+                              getContactId(ticket.contact, ticket.isGroup),
                               body
                             );
                             await sleep(2000);
@@ -1656,9 +1558,7 @@ export const provider = async (
                               text: formatBody(`${linha_digitavel}`, contact)
                             };
                             await wbot.sendMessage(
-                              `${ticket.contact.number}@${
-                                ticket.isGroup ? "g.us" : "s.whatsapp.net"
-                              }`,
+                              getContactId(ticket.contact, ticket.isGroup),
                               body_linha_digitavel
                             );
                             ///VE SE ESTA BLOQUEADO PARA LIBERAR!
@@ -1696,9 +1596,10 @@ export const provider = async (
                                   };
                                   await sleep(2000);
                                   await wbot.sendMessage(
-                                    `${ticket.contact.number}@${
-                                      ticket.isGroup ? "g.us" : "s.whatsapp.net"
-                                    }`,
+                                    getContactId(
+                                      ticket.contact,
+                                      ticket.isGroup
+                                    ),
                                     bodyPdf
                                   );
                                   const bodyqrcode = {
@@ -1709,9 +1610,10 @@ export const provider = async (
                                   };
                                   await sleep(2000);
                                   await wbot.sendMessage(
-                                    `${ticket.contact.number}@${
-                                      ticket.isGroup ? "g.us" : "s.whatsapp.net"
-                                    }`,
+                                    getContactId(
+                                      ticket.contact,
+                                      ticket.isGroup
+                                    ),
                                     bodyqrcode
                                   );
                                   //REALIZANDO O DESBLOQUEIO
@@ -1765,11 +1667,10 @@ export const provider = async (
                                             if (tipo === "success") {
                                               await sleep(2000);
                                               await wbot.sendMessage(
-                                                `${ticket.contact.number}@${
+                                                getContactId(
+                                                  ticket.contact,
                                                   ticket.isGroup
-                                                    ? "g.us"
-                                                    : "s.whatsapp.net"
-                                                }`,
+                                                ),
                                                 body_mensagem
                                               );
                                               const bodyPdf = {
@@ -1780,11 +1681,10 @@ export const provider = async (
                                               };
                                               await sleep(2000);
                                               await wbot.sendMessage(
-                                                `${ticket.contact.number}@${
+                                                getContactId(
+                                                  ticket.contact,
                                                   ticket.isGroup
-                                                    ? "g.us"
-                                                    : "s.whatsapp.net"
-                                                }`,
+                                                ),
                                                 bodyPdf
                                               );
                                               const bodyfinaliza = {
@@ -1795,11 +1695,10 @@ export const provider = async (
                                               };
                                               await sleep(2000);
                                               await wbot.sendMessage(
-                                                `${ticket.contact.number}@${
+                                                getContactId(
+                                                  ticket.contact,
                                                   ticket.isGroup
-                                                    ? "g.us"
-                                                    : "s.whatsapp.net"
-                                                }`,
+                                                ),
                                                 bodyfinaliza
                                               );
                                               await UpdateTicketService({
@@ -1812,11 +1711,10 @@ export const provider = async (
                                             } else {
                                               await sleep(2000);
                                               await wbot.sendMessage(
-                                                `${ticket.contact.number}@${
+                                                getContactId(
+                                                  ticket.contact,
                                                   ticket.isGroup
-                                                    ? "g.us"
-                                                    : "s.whatsapp.net"
-                                                }`,
+                                                ),
                                                 body_mensagem
                                               );
                                               const bodyPdf = {
@@ -1827,11 +1725,10 @@ export const provider = async (
                                               };
                                               await sleep(2000);
                                               await wbot.sendMessage(
-                                                `${ticket.contact.number}@${
+                                                getContactId(
+                                                  ticket.contact,
                                                   ticket.isGroup
-                                                    ? "g.us"
-                                                    : "s.whatsapp.net"
-                                                }`,
+                                                ),
                                                 bodyPdf
                                               );
                                               const bodyqrcode = {
@@ -1842,11 +1739,10 @@ export const provider = async (
                                               };
                                               await sleep(2000);
                                               await wbot.sendMessage(
-                                                `${ticket.contact.number}@${
+                                                getContactId(
+                                                  ticket.contact,
                                                   ticket.isGroup
-                                                    ? "g.us"
-                                                    : "s.whatsapp.net"
-                                                }`,
+                                                ),
                                                 bodyqrcode
                                               );
                                               const bodyfinaliza = {
@@ -1857,11 +1753,10 @@ export const provider = async (
                                               };
                                               await sleep(2000);
                                               await wbot.sendMessage(
-                                                `${ticket.contact.number}@${
+                                                getContactId(
+                                                  ticket.contact,
                                                   ticket.isGroup
-                                                    ? "g.us"
-                                                    : "s.whatsapp.net"
-                                                }`,
+                                                ),
                                                 bodyfinaliza
                                               );
                                               await UpdateTicketService({
@@ -1886,11 +1781,10 @@ export const provider = async (
                                         };
                                         await sleep(2000);
                                         await wbot.sendMessage(
-                                          `${ticket.contact.number}@${
+                                          getContactId(
+                                            ticket.contact,
                                             ticket.isGroup
-                                              ? "g.us"
-                                              : "s.whatsapp.net"
-                                          }`,
+                                          ),
                                           bodyerro
                                         );
                                       }
@@ -1904,11 +1798,10 @@ export const provider = async (
                                       };
                                       await sleep(2000);
                                       await wbot.sendMessage(
-                                        `${ticket.contact.number}@${
+                                        getContactId(
+                                          ticket.contact,
                                           ticket.isGroup
-                                            ? "g.us"
-                                            : "s.whatsapp.net"
-                                        }`,
+                                        ),
                                         bodyerro
                                       );
                                     });
@@ -1921,9 +1814,10 @@ export const provider = async (
                                   };
                                   await sleep(2000);
                                   await wbot.sendMessage(
-                                    `${ticket.contact.number}@${
-                                      ticket.isGroup ? "g.us" : "s.whatsapp.net"
-                                    }`,
+                                    getContactId(
+                                      ticket.contact,
+                                      ticket.isGroup
+                                    ),
                                     bodyfinaliza
                                   );
                                   await UpdateTicketService({
@@ -1944,9 +1838,7 @@ export const provider = async (
                                 };
                                 await sleep(2000);
                                 await wbot.sendMessage(
-                                  `${ticket.contact.number}@${
-                                    ticket.isGroup ? "g.us" : "s.whatsapp.net"
-                                  }`,
+                                  getContactId(ticket.contact, ticket.isGroup),
                                   bodyerro
                                 );
                               });
@@ -1972,9 +1864,7 @@ export const provider = async (
                 };
                 await sleep(2000);
                 await wbot.sendMessage(
-                  `${ticket.contact.number}@${
-                    ticket.isGroup ? "g.us" : "s.whatsapp.net"
-                  }`,
+                  getContactId(ticket.contact, ticket.isGroup),
                   body
                 );
               });
@@ -1987,9 +1877,7 @@ export const provider = async (
             };
             await sleep(2000);
             await wbot.sendMessage(
-              `${ticket.contact.number}@${
-                ticket.isGroup ? "g.us" : "s.whatsapp.net"
-              }`,
+              getContactId(ticket.contact, ticket.isGroup),
               body
             );
           }
@@ -2094,9 +1982,7 @@ export const provider = async (
             try {
               await sleep(2000);
               await wbot.sendMessage(
-                `${ticket.contact.number}@${
-                  ticket.isGroup ? "g.us" : "s.whatsapp.net"
-                }`,
+                getContactId(ticket.contact, ticket.isGroup),
                 body
               );
             } catch (error) {}
@@ -2130,9 +2016,7 @@ export const provider = async (
                   };
                   await sleep(2000);
                   await wbot.sendMessage(
-                    `${ticket.contact.number}@${
-                      ticket.isGroup ? "g.us" : "s.whatsapp.net"
-                    }`,
+                    getContactId(ticket.contact, ticket.isGroup),
                     body
                   );
                 }
@@ -2146,9 +2030,7 @@ export const provider = async (
                   try {
                     await sleep(2000);
                     await wbot.sendMessage(
-                      `${ticket.contact.number}@${
-                        ticket.isGroup ? "g.us" : "s.whatsapp.net"
-                      }`,
+                      getContactId(ticket.contact, ticket.isGroup),
                       body
                     );
                   } catch (error) {}
@@ -2169,9 +2051,7 @@ export const provider = async (
                   };
                   await sleep(2000);
                   await wbot.sendMessage(
-                    `${ticket.contact.number}@${
-                      ticket.isGroup ? "g.us" : "s.whatsapp.net"
-                    }`,
+                    getContactId(ticket.contact, ticket.isGroup),
                     body
                   );
                   ///VE SE ESTA BLOQUEADO PARA LIBERAR!
@@ -2209,9 +2089,7 @@ export const provider = async (
                         };
                         await sleep(2000);
                         await wbot.sendMessage(
-                          `${ticket.contact.number}@${
-                            ticket.isGroup ? "g.us" : "s.whatsapp.net"
-                          }`,
+                          getContactId(ticket.contact, ticket.isGroup),
                           bodyPdf
                         );
                         const bodyqrcode = {
@@ -2222,9 +2100,7 @@ export const provider = async (
                         };
                         await sleep(2000);
                         await wbot.sendMessage(
-                          `${ticket.contact.number}@${
-                            ticket.isGroup ? "g.us" : "s.whatsapp.net"
-                          }`,
+                          getContactId(ticket.contact, ticket.isGroup),
                           bodyqrcode
                         );
                         //REALIZANDO O DESBLOQUEIO
@@ -2276,11 +2152,10 @@ export const provider = async (
                                   if (tipo === "success") {
                                     await sleep(2000);
                                     await wbot.sendMessage(
-                                      `${ticket.contact.number}@${
+                                      getContactId(
+                                        ticket.contact,
                                         ticket.isGroup
-                                          ? "g.us"
-                                          : "s.whatsapp.net"
-                                      }`,
+                                      ),
                                       body_mensagem
                                     );
                                     const bodyPdf = {
@@ -2291,11 +2166,10 @@ export const provider = async (
                                     };
                                     await sleep(2000);
                                     await wbot.sendMessage(
-                                      `${ticket.contact.number}@${
+                                      getContactId(
+                                        ticket.contact,
                                         ticket.isGroup
-                                          ? "g.us"
-                                          : "s.whatsapp.net"
-                                      }`,
+                                      ),
                                       bodyPdf
                                     );
                                     const bodyfinaliza = {
@@ -2306,11 +2180,10 @@ export const provider = async (
                                     };
                                     await sleep(2000);
                                     await wbot.sendMessage(
-                                      `${ticket.contact.number}@${
+                                      getContactId(
+                                        ticket.contact,
                                         ticket.isGroup
-                                          ? "g.us"
-                                          : "s.whatsapp.net"
-                                      }`,
+                                      ),
                                       bodyfinaliza
                                     );
                                     await UpdateTicketService({
@@ -2321,11 +2194,10 @@ export const provider = async (
                                   } else {
                                     await sleep(2000);
                                     await wbot.sendMessage(
-                                      `${ticket.contact.number}@${
+                                      getContactId(
+                                        ticket.contact,
                                         ticket.isGroup
-                                          ? "g.us"
-                                          : "s.whatsapp.net"
-                                      }`,
+                                      ),
                                       body_mensagem
                                     );
                                     const bodyPdf = {
@@ -2336,11 +2208,10 @@ export const provider = async (
                                     };
                                     await sleep(2000);
                                     await wbot.sendMessage(
-                                      `${ticket.contact.number}@${
+                                      getContactId(
+                                        ticket.contact,
                                         ticket.isGroup
-                                          ? "g.us"
-                                          : "s.whatsapp.net"
-                                      }`,
+                                      ),
                                       bodyPdf
                                     );
                                     const bodyqrcode = {
@@ -2351,11 +2222,10 @@ export const provider = async (
                                     };
                                     await sleep(2000);
                                     await wbot.sendMessage(
-                                      `${ticket.contact.number}@${
+                                      getContactId(
+                                        ticket.contact,
                                         ticket.isGroup
-                                          ? "g.us"
-                                          : "s.whatsapp.net"
-                                      }`,
+                                      ),
                                       bodyqrcode
                                     );
                                     const bodyfinaliza = {
@@ -2366,11 +2236,10 @@ export const provider = async (
                                     };
                                     await sleep(2000);
                                     await wbot.sendMessage(
-                                      `${ticket.contact.number}@${
+                                      getContactId(
+                                        ticket.contact,
                                         ticket.isGroup
-                                          ? "g.us"
-                                          : "s.whatsapp.net"
-                                      }`,
+                                      ),
                                       bodyfinaliza
                                     );
                                     await UpdateTicketService({
@@ -2393,16 +2262,12 @@ export const provider = async (
                               };
                               await sleep(2000);
                               await wbot.sendMessage(
-                                `${ticket.contact.number}@${
-                                  ticket.isGroup ? "g.us" : "s.whatsapp.net"
-                                }`,
+                                getContactId(ticket.contact, ticket.isGroup),
                                 bodyerro
                               );
                               await sleep(2000);
                               await wbot.sendMessage(
-                                `${ticket.contact.number}@${
-                                  ticket.isGroup ? "g.us" : "s.whatsapp.net"
-                                }`,
+                                getContactId(ticket.contact, ticket.isGroup),
                                 body_mensagem
                               );
                               const bodyerroatendente = {
@@ -2413,17 +2278,10 @@ export const provider = async (
                               };
                               await sleep(2000);
                               await wbot.sendMessage(
-                                `${ticket.contact.number}@${
-                                  ticket.isGroup ? "g.us" : "s.whatsapp.net"
-                                }`,
+                                getContactId(ticket.contact, ticket.isGroup),
                                 bodyerroatendente
                               );
-                            } /* else {
-                                 const bodyerro = {
-                  text: formatBody(`Ops! Ocorreu um erro e nao consegui desbloquear! Digite *#* e fale com um atendente!`
-                                 await sleep(2000)
-                                 await wbot.sendMessage(`${ticket.contact.number}@${ticket.isGroup ? "g.us" : "s.whatsapp.net"}`,bodyerro);
-                             } */
+                            }
                           })
                           .catch(async function (error) {
                             const bodyerro = {
@@ -2434,9 +2292,7 @@ export const provider = async (
                             };
                             await sleep(2000);
                             await wbot.sendMessage(
-                              `${ticket.contact.number}@${
-                                ticket.isGroup ? "g.us" : "s.whatsapp.net"
-                              }`,
+                              getContactId(ticket.contact, ticket.isGroup),
                               bodyerro
                             );
                           });
@@ -2449,9 +2305,7 @@ export const provider = async (
                         };
                         await sleep(2000);
                         await wbot.sendMessage(
-                          `${ticket.contact.number}@${
-                            ticket.isGroup ? "g.us" : "s.whatsapp.net"
-                          }`,
+                          getContactId(ticket.contact, ticket.isGroup),
                           bodysembloqueio
                         );
                         const bodyfinaliza = {
@@ -2462,9 +2316,7 @@ export const provider = async (
                         };
                         await sleep(2000);
                         await wbot.sendMessage(
-                          `${ticket.contact.number}@${
-                            ticket.isGroup ? "g.us" : "s.whatsapp.net"
-                          }`,
+                          getContactId(ticket.contact, ticket.isGroup),
                           bodyfinaliza
                         );
                         await UpdateTicketService({
@@ -2485,9 +2337,7 @@ export const provider = async (
                       };
                       await sleep(2000);
                       await wbot.sendMessage(
-                        `${ticket.contact.number}@${
-                          ticket.isGroup ? "g.us" : "s.whatsapp.net"
-                        }`,
+                        getContactId(ticket.contact, ticket.isGroup),
                         bodyerro
                       );
                     });
@@ -2502,9 +2352,7 @@ export const provider = async (
                 };
                 await sleep(2000);
                 await wbot.sendMessage(
-                  `${ticket.contact.number}@${
-                    ticket.isGroup ? "g.us" : "s.whatsapp.net"
-                  }`,
+                  getContactId(ticket.contact, ticket.isGroup),
                   body
                 );
               });
@@ -2517,9 +2365,7 @@ export const provider = async (
             };
             await sleep(2000);
             await wbot.sendMessage(
-              `${ticket.contact.number}@${
-                ticket.isGroup ? "g.us" : "s.whatsapp.net"
-              }`,
+              getContactId(ticket.contact, ticket.isGroup),
               body
             );
           }

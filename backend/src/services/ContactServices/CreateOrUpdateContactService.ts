@@ -43,12 +43,13 @@ const CreateOrUpdateContactService = async ({
   const normalizedJid = jidNormalizedUser(number);
   const senderLid = msg
     ? getSenderLid(msg)
-    : { lid: undefined, jid: undefined };
+    : { lid: undefined, jid: normalizedJid };
+  const jid = toJid(senderLid.lid || senderLid.jid);
 
   const contactIdentifiers = {
-    contactId: normalizedJid,
+    contactId: jid,
     lid: senderLid.lid,
-    phoneNumber: senderLid.jid.replace(/\D/g, "")
+    phoneNumber: jid.replace(/\D/g, "")
   };
 
   const io = getIO();
@@ -59,12 +60,12 @@ const CreateOrUpdateContactService = async ({
       [Op.or]: [
         {
           contactId: {
-            [Op.in]: [normalizedJid, cleanNumber, number]
+            [Op.in]: [jid, normalizedJid, cleanNumber, number]
           }
         },
         {
           lid: {
-            [Op.in]: [normalizedJid, cleanNumber, number]
+            [Op.in]: [jid, normalizedJid, cleanNumber, number]
           }
         },
         { number: cleanNumber },

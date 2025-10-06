@@ -5,6 +5,7 @@ import Message from "../models/Message";
 import Ticket from "../models/Ticket";
 import { logger } from "../utils/logger";
 import GetTicketWbot from "./GetTicketWbot";
+import getContactId from "../utils/GetContactId";
 
 const SetTicketMessagesAsRead = async (ticket: Ticket): Promise<void> => {
   await ticket.update({ unreadMessages: 0 });
@@ -30,9 +31,7 @@ const SetTicketMessagesAsRead = async (ticket: Ticket): Promise<void> => {
       if (lastMessages.key && lastMessages.key.fromMe === false) {
         await (wbot as WASocket).chatModify(
           { markRead: true, lastMessages: [lastMessages] },
-          `${ticket.contact.number}@${
-            ticket.isGroup ? "g.us" : "s.whatsapp.net"
-          }`
+          getContactId(ticket.contact, ticket.isGroup)
         );
       }
     }
