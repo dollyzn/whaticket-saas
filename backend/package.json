@@ -89,7 +89,6 @@
     "eslint-plugin-prettier": "^4.0.0",
     "factory-girl": "^5.0.4",
     "jest": "^27.5.1",
-    "jimp": "^1.6.0",
     "nodemon": "^2.0.15",
     "prettier": "^2.5.1",
     "supertest": "^6.2.2",
