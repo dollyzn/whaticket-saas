@@ -17,9 +17,15 @@ import DeleteWhatsAppMessage from "../services/WbotServices/DeleteWhatsAppMessag
 import SendWhatsAppMedia from "../services/WbotServices/SendWhatsAppMedia";
 import SendWhatsAppMessage from "../services/WbotServices/SendWhatsAppMessage";
 import CheckContactNumber from "../services/WbotServices/CheckNumber";
-import CheckIsValidContact from "../services/WbotServices/CheckIsValidContact";
 import GetProfilePicUrl from "../services/WbotServices/GetProfilePicUrl";
 import CreateOrUpdateContactService from "../services/ContactServices/CreateOrUpdateContactService";
+import ShowWhatsAppService from "../services/WhatsappService/ShowWhatsAppService";
+import Ticket from "../models/Ticket";
+import { fileTypeFromFile } from "file-type";
+import { OpenAI } from "openai";
+import path from "path";
+import fs from "fs";
+
 type IndexQuery = {
   pageNumber: string;
 };
@@ -194,5 +200,122 @@ export const send = async (req: Request, res: Response): Promise<Response> => {
     } else {
       throw new AppError(err.message);
     }
+  }
+};
+
+export const transcribeAudio = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const { messageId } = req.params as { messageId: string };
+  const { companyId } = req.user;
+
+  const message = await Message.findByPk(messageId);
+
+  if (!message) {
+    throw new AppError("Mensagem não encontrada", 404);
+  }
+
+  if (message.companyId !== companyId) {
+    throw new AppError("Não é possível acessar registros de outra empresa");
+  }
+
+  if (message.mediaType !== "audio") {
+    throw new AppError("A mensagem informada não é um áudio", 400);
+  }
+
+  if (message.body && message.body !== "Áudio") {
+    return res.json({ message, alreadyTranscribed: true });
+  }
+
+  const ticket = await ShowTicketService(message.ticketId, companyId);
+
+  let apiKey: string | undefined;
+
+  try {
+    const whatsapp = await ShowWhatsAppService(ticket.whatsappId, companyId);
+    apiKey = whatsapp?.prompt?.apiKey;
+  } catch (_) {}
+
+  if (!apiKey) {
+    apiKey = ticket.queue?.prompt?.apiKey;
+  }
+
+  if (!apiKey) {
+    throw new AppError(
+      "OpenAI não configurado para este WhatsApp ou fila. Configure um Prompt com API Key.",
+      400
+    );
+  }
+
+  const publicDir = path.resolve(__dirname, "..", "..", "public");
+  const mediaFileName = message.mediaUrl?.split("/").pop();
+
+  if (!mediaFileName) {
+    throw new AppError("Arquivo de áudio não localizado", 404);
+  }
+
+  const audioPath = path.join(publicDir, mediaFileName);
+
+  if (!fs.existsSync(audioPath)) {
+    throw new AppError("Arquivo de áudio não encontrado no servidor", 404);
+  }
+
+  const fileType = await fileTypeFromFile(audioPath);
+  if (!fileType || !fileType.mime.startsWith("audio/")) {
+    throw new AppError("O arquivo não é um áudio válido", 400);
+  }
+
+  try {
+    const openai = new OpenAI({ apiKey });
+    const audioStream = fs.createReadStream(audioPath);
+    const transcription = await openai.audio.transcriptions.create({
+      file: audioStream,
+      model: "whisper-1"
+    });
+
+    const text = transcription.text;
+    if (!text) {
+      throw new Error("Falha ao transcrever áudio");
+    }
+
+    await message.update({ body: text });
+
+    const updated = await Message.findByPk(message.id, {
+      include: [
+        "contact",
+        {
+          model: Ticket,
+          as: "ticket",
+          include: [
+            "contact",
+            "queue",
+            {
+              model: Whatsapp,
+              as: "whatsapp",
+              attributes: ["name"]
+            }
+          ]
+        },
+        {
+          model: Message,
+          as: "quotedMsg",
+          include: ["contact"]
+        }
+      ]
+    });
+
+    const io = getIO();
+    io.to(message.ticketId.toString()).emit(`company-${companyId}-appMessage`, {
+      action: "update",
+      message: updated
+    });
+
+    return res.json({ message: updated });
+  } catch (err: any) {
+    throw new AppError(
+      err?.message || "Erro ao transcrever o áudio com OpenAI Whisper",
+      500
+    );
   }
 };

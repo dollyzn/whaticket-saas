@@ -19,6 +19,11 @@ messageRoutes.post(
 );
 messageRoutes.delete("/messages/:messageId", isAuth, MessageController.remove);
 messageRoutes.post(
+  "/messages/:messageId/transcribe",
+  isAuth,
+  MessageController.transcribeAudio
+);
+messageRoutes.post(
   "/api/messages/send/:whatsappId?",
   tokenAuth,
   upload.array("medias") as any,

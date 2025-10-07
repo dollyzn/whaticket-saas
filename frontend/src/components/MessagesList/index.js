@@ -4,7 +4,7 @@ import { isSameDay, parseISO, format } from "date-fns";
 import clsx from "clsx";
 
 import { green } from "@material-ui/core/colors";
-import { Button, CircularProgress, Divider, IconButton, makeStyles } from "@material-ui/core";
+import { Button, CircularProgress, Divider, IconButton, Link, makeStyles } from "@material-ui/core";
 
 import { AccessTime, Block, Done, DoneAll, ExpandMore, GetApp } from "@material-ui/icons";
 
@@ -180,19 +180,19 @@ const useStyles = makeStyles((theme) => ({
 
     textContentItem: {
         overflowWrap: "break-word",
-        padding: "3px 80px 6px 6px",
+        padding: "3px 50px 6px 6px",
     },
 
     textContentItemEdited: {
         overflowWrap: "break-word",
-        padding: "3px 120px 6px 6px",
+        padding: "3px 80px 6px 6px",
     },
 
     textContentItemDeleted: {
         fontStyle: "italic",
         color: "rgba(0, 0, 0, 0.36)",
         overflowWrap: "break-word",
-        padding: "3px 80px 6px 6px",
+        padding: "3px 60px 6px 6px",
     },
 
     messageMedia: {
@@ -203,6 +203,22 @@ const useStyles = makeStyles((theme) => ({
         borderTopRightRadius: 8,
         borderBottomLeftRadius: 8,
         borderBottomRightRadius: 8,
+    },
+
+    transcribeButton: {
+        fontSize: 13,
+        display: "flex",
+        alignItems: "center",
+        gap: 4,
+    },
+
+    transcribeButtonDisabled: {
+        fontSize: 13,
+        display: "flex",
+        alignItems: "center",
+        gap: 4,
+        color: theme.palette.text.secondary,
+        "&:hover": { textDecoration: "none" },
     },
 
     timestamp: {
@@ -319,6 +335,8 @@ const MessagesList = ({ ticket, ticketId, isGroup }) => {
     const messageOptionsMenuOpen = Boolean(anchorEl);
     const currentTicketId = useRef(ticketId);
 
+    const [transcribingMap, setTranscribingMap] = useState({});
+
     useEffect(() => {
         dispatch({ type: "RESET" });
         setPageNumber(1);
@@ -415,6 +433,20 @@ const MessagesList = ({ ticket, ticketId, isGroup }) => {
         setAnchorEl(null);
     };
 
+    const handleTranscribe = async (id) => {
+        setTranscribingMap((prev) => ({ ...prev, [id]: true }));
+        try {
+            await api.post(`/messages/${id}/transcribe`);
+        } catch (err) {
+            toastError(err);
+        } finally {
+            setTranscribingMap((prev) => ({
+                ...prev,
+                [id]: false,
+            }));
+        }
+    };
+
     const checkMessageMedia = (message) => {
         if (message.mediaType === "locationMessage" && message.body.split("|").length >= 2) {
             let locationParts = message.body.split("|");
@@ -427,41 +459,6 @@ const MessagesList = ({ ticket, ticketId, isGroup }) => {
 
             return <LocationPreview image={imageLocation} link={linkLocation} description={descriptionLocation} />;
         } else if (message.mediaType === "image") {
-            /* else if (message.mediaType === "vcard") {
-      let array = message.body.split("\n");
-      let obj = [];
-      let contact = "";
-      for (let index = 0; index < array.length; index++) {
-        const v = array[index];
-        let values = v.split(":");
-        for (let ind = 0; ind < values.length; ind++) {
-          if (values[ind].indexOf("+") !== -1) {
-            obj.push({ number: values[ind] });
-          }
-          if (values[ind].indexOf("FN") !== -1) {
-            contact = values[ind + 1];
-          }
-        }
-      }
-      return <VcardPreview contact={contact} numbers={obj[0].number} />
-    } */
-            /*else if (message.mediaType === "multi_vcard") {
-      console.log("multi_vcard")
-      console.log(message)
-    	
-      if(message.body !== null && message.body !== "") {
-        let newBody = JSON.parse(message.body)
-        return (
-          <>
-            {
-            newBody.map(v => (
-              <VcardPreview contact={v.name} numbers={v.number} />
-            ))
-            }
-          </>
-        )
-      } else return (<></>)
-    }*/
             return <ModalImageCors imageUrl={message.mediaUrl} />;
         } else if (message.mediaType === "audio") {
             return (
@@ -624,6 +621,9 @@ const MessagesList = ({ ticket, ticketId, isGroup }) => {
     const renderMessages = () => {
         if (messagesList.length > 0) {
             const viewMessagesList = messagesList.map((message, index) => {
+                const isAudioWithTranscribe =
+                    message.mediaType === "audio" && (message.body === "Áudio" || !message.body);
+
                 if (message.mediaType === "call_log") {
                     return (
                         <React.Fragment key={message.id}>
@@ -690,13 +690,40 @@ const MessagesList = ({ ticket, ticketId, isGroup }) => {
                                 {(message.mediaUrl ||
                                     message.mediaType === "locationMessage" ||
                                     message.mediaType === "vcard") &&
-                                    //|| message.mediaType === "multi_vcard"
                                     checkMessageMedia(message)}
-                                <div className={classes.textContentItem}>
+                                <div
+                                    className={clsx(classes.textContentItem, {
+                                        [classes.textContentItemDeleted]: message.isDeleted,
+                                        [classes.textContentItemEdited]: message.isEdited,
+                                    })}
+                                >
                                     {message.quotedMsg && renderQuotedMessage(message)}
-                                    <MarkdownWrapper>
-                                        {message.mediaType === "locationMessage" ? null : message.body}
-                                    </MarkdownWrapper>
+                                    {isAudioWithTranscribe ? (
+                                        <Link
+                                            component="button"
+                                            variant="body2"
+                                            className={clsx(classes.transcribeButton, {
+                                                [classes.transcribeButtonDisabled]: transcribingMap[message.id],
+                                            })}
+                                            onClick={() => handleTranscribe(message.id)}
+                                            disabled={transcribingMap[message.id]}
+                                        >
+                                            {transcribingMap[message.id] && (
+                                                <CircularProgress
+                                                    size={12}
+                                                    style={{
+                                                        marginBottom: 1,
+                                                    }}
+                                                    color="inherit"
+                                                />
+                                            )}
+                                            {transcribingMap[message.id] ? "Transcrevendo..." : "Transcrever"}
+                                        </Link>
+                                    ) : (
+                                        <MarkdownWrapper>
+                                            {message.mediaType === "locationMessage" ? null : message.body}
+                                        </MarkdownWrapper>
+                                    )}
                                     <span className={classes.timestamp}>
                                         {message.isEdited && <span>Editada </span>}
                                         {format(parseISO(message.createdAt), "HH:mm")}
@@ -725,7 +752,6 @@ const MessagesList = ({ ticket, ticketId, isGroup }) => {
                                 {(message.mediaUrl ||
                                     message.mediaType === "locationMessage" ||
                                     message.mediaType === "vcard") &&
-                                    //|| message.mediaType === "multi_vcard"
                                     checkMessageMedia(message)}
                                 <div
                                     className={clsx(classes.textContentItem, {
@@ -737,7 +763,29 @@ const MessagesList = ({ ticket, ticketId, isGroup }) => {
                                         <Block color="disabled" fontSize="small" className={classes.deletedIcon} />
                                     )}
                                     {message.quotedMsg && renderQuotedMessage(message)}
-                                    <MarkdownWrapper>{message.body}</MarkdownWrapper>
+                                    {isAudioWithTranscribe ? (
+                                        <Link
+                                            component="button"
+                                            variant="body2"
+                                            className={clsx(classes.transcribeButton, {
+                                                [classes.transcribeButtonDisabled]: transcribingMap[message.id],
+                                            })}
+                                            onClick={() => handleTranscribe(message.id)}
+                                            disabled={transcribingMap[message.id]}
+                                        >
+                                            {transcribingMap[message.id] && (
+                                                <CircularProgress
+                                                    size={12}
+                                                    style={{
+                                                        marginBottom: 1,
+                                                    }}
+                                                />
+                                            )}
+                                            {transcribingMap[message.id] ? "Transcrevendo..." : "Transcrever"}
+                                        </Link>
+                                    ) : (
+                                        <MarkdownWrapper>{message.body}</MarkdownWrapper>
+                                    )}
                                     <span className={classes.timestamp}>
                                         {message.isEdited && <span>Editada </span>}
                                         {format(parseISO(message.createdAt), "HH:mm")}

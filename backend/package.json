@@ -33,6 +33,7 @@
     "dotenv": "^16.0.0",
     "express": "^4.17.3",
     "express-async-errors": "^3.1.1",
+    "file-type": "^21.0.0",
     "fluent-ffmpeg": "^2.1.2",
     "gn-api-sdk-typescript": "^1.0.7",
     "http-graceful-shutdown": "^3.1.6",
