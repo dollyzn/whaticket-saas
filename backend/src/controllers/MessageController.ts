@@ -19,7 +19,7 @@ import SendWhatsAppMessage from "../services/WbotServices/SendWhatsAppMessage";
 import CheckContactNumber from "../services/WbotServices/CheckNumber";
 import GetProfilePicUrl from "../services/WbotServices/GetProfilePicUrl";
 import CreateOrUpdateContactService from "../services/ContactServices/CreateOrUpdateContactService";
-import ShowWhatsAppService from "../services/WhatsappService/ShowWhatsAppService";
+import Prompt from "../models/Prompt";
 import Ticket from "../models/Ticket";
 import { fileTypeFromFile } from "file-type";
 import { OpenAI } from "openai";
@@ -228,22 +228,11 @@ export const transcribeAudio = async (
     return res.json({ message, alreadyTranscribed: true });
   }
 
-  const ticket = await ShowTicketService(message.ticketId, companyId);
+  const prompt = await Prompt.findOne();
 
-  let apiKey: string | undefined;
-
-  try {
-    const whatsapp = await ShowWhatsAppService(ticket.whatsappId, companyId);
-    apiKey = whatsapp?.prompt?.apiKey;
-  } catch (_) {}
-
-  if (!apiKey) {
-    apiKey = ticket.queue?.prompt?.apiKey;
-  }
-
-  if (!apiKey) {
+  if (!prompt || !prompt.apiKey) {
     throw new AppError(
-      "OpenAI não configurado para este WhatsApp ou fila. Configure um Prompt com API Key.",
+      "OpenAI não configurado no sistema. Cadastre um Prompt com API Key.",
       400
     );
   }
@@ -267,7 +256,7 @@ export const transcribeAudio = async (
   }
 
   try {
-    const openai = new OpenAI({ apiKey });
+    const openai = new OpenAI({ apiKey: prompt.apiKey });
     const audioStream = fs.createReadStream(audioPath);
     const transcription = await openai.audio.transcriptions.create({
       file: audioStream,
