@@ -557,11 +557,6 @@ const verifyQuotedMessage = async (
   return quotedMsg;
 };
 
-const sanitizeName = (name: string): string => {
-  let sanitized = name.split(" ")[0];
-  sanitized = sanitized.replace(/[^\p{L}\p{N}]/gu, "");
-  return sanitized.substring(0, 60);
-};
 const convertTextToSpeechAndSaveToFile = (
   text: string,
   filename: string,
@@ -734,7 +729,7 @@ const extractUserMessage = async (
   if (msg.message?.imageMessage) {
     const caption = msg.message.imageMessage.caption;
     if (caption) {
-      return caption;
+      return `O usuário enviou uma imagem: ${caption}`;
     } else {
       return "O usuário enviou uma imagem";
     }
@@ -744,7 +739,7 @@ const extractUserMessage = async (
   if (msg.message?.videoMessage) {
     const caption = msg.message.videoMessage.caption;
     if (caption) {
-      return caption;
+      return `O usuário enviou um vídeo: ${caption}`;
     } else {
       return "O usuário enviou um vídeo";
     }
@@ -755,7 +750,7 @@ const extractUserMessage = async (
     const caption = msg.message.documentMessage.caption;
     const fileName = msg.message.documentMessage.fileName || "documento";
     if (caption) {
-      return `${caption} (arquivo: ${fileName})`;
+      return `O usuário enviou um documento: ${caption} (arquivo: ${fileName})`;
     } else {
       return `O usuário enviou um documento: ${fileName}`;
     }
@@ -793,6 +788,22 @@ const extractUserMessage = async (
   return null;
 };
 
+const sanitizeName = (name: string): string => {
+  if (!name) return "Desconhecido";
+  // mantém letras e acentos, mas remove números, emojis e pontuação
+  let sanitized = name.replace(/[^A-Za-zÀ-ÖØ-öø-ÿ\s]/g, "");
+  sanitized = sanitized.trim().split(/\s+/)[0]; // pega a primeira palavra útil
+  return sanitized.substring(0, 60);
+};
+
+const extractSignatureName = (body: string): string | null => {
+  // Assinaturas do tipo "*Natã:*"
+  const match = body.match(/^\*([^*]+):\*/);
+  if (!match) return null;
+  const rawName = match[1].trim();
+  return sanitizeName(rawName);
+};
+
 const buildMessageArray = ({
   systemPrompt,
   messageHistory,
@@ -806,10 +817,8 @@ const buildMessageArray = ({
 }): OpenAI.Chat.Completions.ChatCompletionMessageParam[] => {
   const systemMessage = {
     role: "system" as const,
-    content: `O nome do cliente é ${sanitizeName(
-      contactName || "Não informado"
-    )}.
-    - IMPORTANTE: Para transferir o atendimento a um humano/atendente inicie a resposta com exatamente: 'Ação: Transferir para o setor de atendimento'
+    content: `Mensagens com \`name\` começando com 'Atendente' foram escritas por pessoas humanas do time de suporte.
+    # IMPORTANTE: Para transferir o atendimento a um humano/atendente inicie a resposta com exatamente: Ação: Transferir para o setor de atendimento
     Instruções:
     ${systemPrompt.prompt}`
   };
@@ -833,16 +842,39 @@ const buildMessageArray = ({
     }
   }
 
+  function getAssistantName(name: string, promptName: string): string {
+    if (name && name !== promptName) {
+      return `Atendente:${name}`;
+    } else return promptName ?? "IA";
+  }
+
   const processedHistory: OpenAI.Chat.Completions.ChatCompletionMessageParam[] =
-    messageHistory.slice(0, -1).map(msg => ({
-      role: msg.fromMe ? "assistant" : "user",
-      content: getMessageContent(msg).replace(`*${systemPrompt.name}:*`, "")
-    }));
+    messageHistory.slice(0, -1).map(msg => {
+      const rawContent = getMessageContent(msg);
+      const extractedName = extractSignatureName(rawContent);
+      const contentWithoutSignature = extractedName
+        ? rawContent.replace(/^\*[^*]+:\*/, "").trim()
+        : rawContent;
+
+      const name = msg.fromMe
+        ? getAssistantName(extractedName, sanitizeName(systemPrompt.name))
+        : sanitizeName(contactName);
+
+      return {
+        role: msg.fromMe ? "assistant" : "user",
+        content: contentWithoutSignature,
+        name
+      };
+    });
 
   return [
     systemMessage,
     ...processedHistory,
-    { role: "user", content: userMessage }
+    {
+      role: "user" as const,
+      content: userMessage,
+      name: sanitizeName(contactName)
+    }
   ];
 };
 
