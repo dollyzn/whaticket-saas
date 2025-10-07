@@ -3,15 +3,15 @@ echo "Updating Whaticket, please wait."
 
 git pull
 cd backend
-npm install
+yarn
 rm -rf dist
-npm run build
+yarn build
 npx sequelize db:migrate
 npx sequelize db:seed
 cd ../frontend
-npm install
+yarn
 rm -rf build
-npm run build
+yarn build
 pm2 restart all
 
 echo "Update finished. Enjoy!"
