@@ -210,6 +210,7 @@ const useStyles = makeStyles((theme) => ({
         display: "flex",
         alignItems: "center",
         gap: 4,
+        color: "#C90003",
     },
 
     transcribeButtonDisabled: {
@@ -217,7 +218,7 @@ const useStyles = makeStyles((theme) => ({
         display: "flex",
         alignItems: "center",
         gap: 4,
-        color: theme.palette.text.secondary,
+        color: theme.mode === "light" ? theme.palette.text.secondary : "#0000008a",
         "&:hover": { textDecoration: "none" },
     },
 
