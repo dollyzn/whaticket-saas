@@ -5,6 +5,7 @@ import GetTicketWbot from "../../helpers/GetTicketWbot";
 import GetWbotMessage from "../../helpers/GetWbotMessage";
 import Message from "../../models/Message";
 import Ticket from "../../models/Ticket";
+import { SendWhatsAppMessage } from "../../helpers/SendWhatsAppMessage";
 
 const DeleteWhatsAppMessage = async (messageId: string): Promise<Message> => {
   const message = await Message.findByPk(messageId, {
@@ -31,7 +32,7 @@ const DeleteWhatsAppMessage = async (messageId: string): Promise<Message> => {
 
     const menssageDelete = messageToDelete as Message;
 
-    await (wbot as WASocket).sendMessage(menssageDelete.remoteJid, {
+    await SendWhatsAppMessage(wbot, menssageDelete.remoteJid, {
       delete: {
         id: menssageDelete.id,
         remoteJid: menssageDelete.remoteJid,

@@ -32,6 +32,7 @@ import { Store } from "../../libs/store";
 import TicketTraking from "../../models/TicketTraking";
 import UserRating from "../../models/UserRating";
 import SendWhatsAppMessage from "./SendWhatsAppMessage";
+import { SendWhatsAppMessage as SendWhatsAppMessageHelper } from "../../helpers/SendWhatsAppMessage";
 import moment from "moment";
 import Queue from "../../models/Queue";
 import QueueOption from "../../models/QueueOption";
@@ -235,7 +236,8 @@ export const sendMessageImage = async (
 ) => {
   let sentMessage;
   try {
-    sentMessage = await wbot.sendMessage(
+    sentMessage = await SendWhatsAppMessageHelper(
+      wbot,
       getContactId(contact, ticket.isGroup),
       {
         image: url
@@ -247,7 +249,8 @@ export const sendMessageImage = async (
       }
     );
   } catch (error) {
-    sentMessage = await wbot.sendMessage(
+    sentMessage = await SendWhatsAppMessageHelper(
+      wbot,
       getContactId(contact, ticket.isGroup),
       {
         text: formatBody("Não consegui enviar o PDF, tente novamente!", contact)
@@ -266,7 +269,8 @@ export const sendMessageLink = async (
 ) => {
   let sentMessage;
   try {
-    sentMessage = await wbot.sendMessage(
+    sentMessage = await SendWhatsAppMessageHelper(
+      wbot,
       getContactId(contact, ticket.isGroup),
       {
         document: url
@@ -278,7 +282,8 @@ export const sendMessageLink = async (
       }
     );
   } catch (error) {
-    sentMessage = await wbot.sendMessage(
+    sentMessage = await SendWhatsAppMessageHelper(
+      wbot,
       getContactId(contact, ticket.isGroup),
       {
         text: formatBody("Não consegui enviar o PDF, tente novamente!", contact)
@@ -933,7 +938,8 @@ const sendTextResponse = async (
     contact: Contact;
   }
 ) => {
-  const sentMessage = await context.wbot.sendMessage(
+  const sentMessage = await SendWhatsAppMessageHelper(
+    context.wbot,
     context.originalMsg.key.remoteJid!,
     {
       text: response
@@ -965,7 +971,8 @@ const sendAudioResponse = async (
       "mp3"
     );
 
-    const sendMessage = await context.wbot.sendMessage(
+    const sendMessage = await SendWhatsAppMessageHelper(
+      context.wbot,
       context.originalMsg.key.remoteJid!,
       {
         audio: { url: `${publicFolder}/${fileName}.mp3` },
@@ -1271,7 +1278,8 @@ const verifyQueue = async (
       text: formatBody(`\u200e${greetingMessage}\n\n${options}`, contact)
     };
 
-    const sendMsg = await wbot.sendMessage(
+    const sendMsg = await SendWhatsAppMessageHelper(
+      wbot,
       getContactId(contact, ticket.isGroup),
       textMessage
     );
@@ -1296,7 +1304,8 @@ const verifyQueue = async (
       headerType: 1
     };
 
-    const sendMsg = await wbot.sendMessage(
+    const sendMsg = await SendWhatsAppMessageHelper(
+      wbot,
       getContactId(contact, ticket.isGroup),
       buttonMessage
     );
@@ -1353,7 +1362,8 @@ const verifyQueue = async (
             `\u200e ${queue.outOfHoursMessage}\n\n*[ # ]* - Voltar ao Menu Principal`,
             ticket.contact
           );
-          const sentMessage = await wbot.sendMessage(
+          const sentMessage = await SendWhatsAppMessageHelper(
+            wbot,
             getContactId(contact, ticket.isGroup),
             {
               text: body
@@ -1409,7 +1419,8 @@ const verifyQueue = async (
         ticket.contact
       );
       if (choosenQueue.greetingMessage) {
-        const sentMessage = await wbot.sendMessage(
+        const sentMessage = await SendWhatsAppMessageHelper(
+          wbot,
           getContactId(contact, ticket.isGroup),
           {
             text: body
@@ -1652,7 +1663,8 @@ const handleChartbot = async (
         headerType: 4
       };
 
-      const sendMsg = await wbot.sendMessage(
+      const sendMsg = await SendWhatsAppMessageHelper(
+        wbot,
         getContactId(ticket.contact, ticket.isGroup),
         buttonMessage
       );
@@ -1676,7 +1688,8 @@ const handleChartbot = async (
         )
       };
 
-      const sendMsg = await wbot.sendMessage(
+      const sendMsg = await SendWhatsAppMessageHelper(
+        wbot,
         getContactId(ticket.contact, ticket.isGroup),
         textMessage
       );
@@ -1743,7 +1756,8 @@ const handleChartbot = async (
           sections
         };
 
-        const sendMsg = await wbot.sendMessage(
+        const sendMsg = await SendWhatsAppMessageHelper(
+          wbot,
           getContactId(ticket.contact, ticket.isGroup),
           listMessage
         );
@@ -1772,7 +1786,8 @@ const handleChartbot = async (
           headerType: 4
         };
 
-        const sendMsg = await wbot.sendMessage(
+        const sendMsg = await SendWhatsAppMessageHelper(
+          wbot,
           getContactId(ticket.contact, ticket.isGroup),
           buttonMessage
         );
@@ -1795,7 +1810,8 @@ const handleChartbot = async (
           )
         };
 
-        const sendMsg = await wbot.sendMessage(
+        const sendMsg = await SendWhatsAppMessageHelper(
+          wbot,
           getContactId(ticket.contact, ticket.isGroup),
           textMessage
         );
@@ -1945,9 +1961,13 @@ const sendDialogflowAwswer = async (
   if (!dialogFlowReply) {
     wbot.sendPresenceUpdate("composing", msg.key.remoteJid);
     await delay(3000);
-    const sentMessage = await wbot.sendMessage(msg.key.remoteJid, {
-      text: `*${ticket.queue.queueIntegrations.name}:*\nNão consegui entender sua dúvida.`
-    });
+    const sentMessage = await SendWhatsAppMessageHelper(
+      wbot,
+      msg.key.remoteJid,
+      {
+        text: `*${ticket.queue.queueIntegrations.name}:*\nNão consegui entender sua dúvida.`
+      }
+    );
     await verifyMessage(sentMessage, ticket, contact);
     return;
   }
@@ -2013,7 +2033,7 @@ async function sendDelayedMessages(
         react
       );
     if (test) {
-      wbot.sendMessage(msg.key.remoteJid, {
+      SendWhatsAppMessageHelper(wbot, msg.key.remoteJid, {
         react: {
           text: react,
           key: msg.key
@@ -2023,7 +2043,7 @@ async function sendDelayedMessages(
     }
   }
 
-  const sentMessage = await wbot.sendMessage(msg.key.remoteJid, {
+  const sentMessage = await SendWhatsAppMessageHelper(wbot, msg.key.remoteJid, {
     text: `*${ticket.queue.queueIntegrations.name}:*\n` + message
   });
 
@@ -2038,18 +2058,26 @@ async function sendDelayedMessages(
   await delay(5000);
 
   if (audio && message === lastMessage) {
-    const sentMessage = await wbot.sendMessage(msg.key.remoteJid, {
-      audio: { url: audio },
-      ptt: true
-    });
+    const sentMessage = await SendWhatsAppMessageHelper(
+      wbot,
+      msg.key.remoteJid,
+      {
+        audio: { url: audio },
+        ptt: true
+      }
+    );
 
     await verifyMessage(sentMessage, ticket, contact);
   }
 
   if (sendImage && message === lastMessage) {
-    const sentMessage = await wbot.sendMessage(msg.key.remoteJid, {
-      image: { url: sendImage }
-    });
+    const sentMessage = await SendWhatsAppMessageHelper(
+      wbot,
+      msg.key.remoteJid,
+      {
+        image: { url: sendImage }
+      }
+    );
 
     await verifyMessage(sentMessage, ticket, contact);
   }
@@ -2252,9 +2280,13 @@ const handleMessage = async (
 
           const debouncedSentMessage = debounce(
             async () => {
-              await wbot.sendMessage(getContactId(contact, ticket.isGroup), {
-                text: body
-              });
+              await SendWhatsAppMessageHelper(
+                wbot,
+                getContactId(contact, ticket.isGroup),
+                {
+                  text: body
+                }
+              );
             },
             3000,
             ticket.id
@@ -2298,7 +2330,8 @@ const handleMessage = async (
               const body = formatBody(`${queue.outOfHoursMessage}`, contact);
               const debouncedSentMessage = debounce(
                 async () => {
-                  await wbot.sendMessage(
+                  await SendWhatsAppMessageHelper(
+                    wbot,
                     getContactId(contact, ticket.isGroup),
                     {
                       text: body
@@ -2417,9 +2450,13 @@ const handleMessage = async (
             const body = queue.outOfHoursMessage;
             const debouncedSentMessage = debounce(
               async () => {
-                await wbot.sendMessage(getContactId(contact, ticket.isGroup), {
-                  text: body
-                });
+                await SendWhatsAppMessageHelper(
+                  wbot,
+                  getContactId(contact, ticket.isGroup),
+                  {
+                    text: body
+                  }
+                );
               },
               3000,
               ticket.id
@@ -2455,9 +2492,13 @@ const handleMessage = async (
       if (whatsapp.greetingMessage) {
         const debouncedSentMessage = debounce(
           async () => {
-            await wbot.sendMessage(getContactId(contact, ticket.isGroup), {
-              text: whatsapp.greetingMessage
-            });
+            await SendWhatsAppMessageHelper(
+              wbot,
+              getContactId(contact, ticket.isGroup),
+              {
+                text: whatsapp.greetingMessage
+              }
+            );
           },
           1000,
           ticket.id

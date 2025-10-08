@@ -9,6 +9,8 @@ import Ticket from "../../models/Ticket";
 import formatBody from "../../helpers/Mustache";
 import getContactId from "../../utils/GetContactId";
 
+import { SendWhatsAppMessage as SendWhatsAppMessageHelper } from "../../helpers/SendWhatsAppMessage";
+
 interface Request {
   body: string;
   ticket: Ticket;
@@ -47,7 +49,8 @@ const SendWhatsAppMessage = async ({
   }
 
   try {
-    const sentMessage = await wbot.sendMessage(
+    const sentMessage = await SendWhatsAppMessageHelper(
+      wbot,
       number,
       {
         text: formatBody(body, ticket.contact)

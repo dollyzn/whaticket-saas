@@ -10,6 +10,7 @@ import Ticket from "../../models/Ticket";
 import mime from "mime-types";
 import formatBody from "../../helpers/Mustache";
 import getContactId from "../../utils/GetContactId";
+import { SendWhatsAppMessage } from "../../helpers/SendWhatsAppMessage";
 
 interface Request {
   media: Express.Multer.File;
@@ -172,7 +173,8 @@ const SendWhatsAppMedia = async ({
       };
     }
 
-    const sentMessage = await wbot.sendMessage(
+    const sentMessage = await SendWhatsAppMessage(
+      wbot,
       getContactId(ticket.contact, ticket.isGroup),
       {
         ...options

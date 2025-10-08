@@ -3,6 +3,7 @@ import GetWhatsappWbot from "./GetWhatsappWbot";
 import fs from "fs";
 
 import { getMessageOptions } from "../services/WbotServices/SendWhatsAppMedia";
+import { SendWhatsAppMessage } from "./SendWhatsAppMessage";
 
 export type MessageData = {
   number: number | string;
@@ -29,13 +30,13 @@ export const SendMessage = async (
       );
       if (options) {
         const body = fs.readFileSync(messageData.mediaPath);
-        message = await wbot.sendMessage(chatId, {
+        message = await SendWhatsAppMessage(wbot, chatId, {
           ...options
         });
       }
     } else {
       const body = `\u200e ${messageData.body}`;
-      message = await wbot.sendMessage(chatId, { text: body });
+      message = await SendWhatsAppMessage(wbot, chatId, { text: body });
     }
 
     return message;

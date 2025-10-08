@@ -12,6 +12,7 @@ import { logger } from "../../utils/logger";
 import createOrUpdateBaileysService from "../BaileysServices/CreateOrUpdateBaileysService";
 import CreateMessageService from "../MessageServices/CreateMessageService";
 import { debounce } from "../../helpers/Debounce";
+import { SendWhatsAppMessage } from "../../helpers/SendWhatsAppMessage";
 
 type Session = WASocket & {
   id?: number;
@@ -43,7 +44,7 @@ const wbotMonitor = async (
               await wbot.rejectCall(callId, from).then(async () => {
                 const debouncedSentMessage = debounce(
                   async () => {
-                    await wbot.sendMessage(from, {
+                    await SendWhatsAppMessage(wbot, from, {
                       text: `*Mensagem Automática:*\nAs chamadas de voz e vídeo estão desabilitadas para este WhatsApp. Por favor, envie uma mensagem de texto.`
                     });
 

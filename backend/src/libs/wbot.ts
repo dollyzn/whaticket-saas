@@ -33,6 +33,8 @@ const sessions: Session[] = [];
 
 const retriesQrCodeMap = new Map<number, number>();
 
+export const sentCache = new NodeCache({ stdTTL: 20, checkperiod: 5 });
+
 export const getWbot = (whatsappId: number): Session => {
   const sessionIndex = sessions.findIndex(s => s.id === whatsappId);
 
@@ -99,7 +101,10 @@ export const initWASocket = async (whatsapp: Whatsapp): Promise<Session> => {
           },
           version: [2, 3000, 1023888953],
           msgRetryCounterCache,
-          shouldIgnoreJid: jid => isJidBroadcast(jid) || isJidNewsletter(jid)
+          shouldIgnoreJid: jid => isJidBroadcast(jid) || isJidNewsletter(jid),
+          getMessage: async ({ id }) => {
+            return sentCache.get(id);
+          }
         });
 
         wsocket.ev.on(

@@ -19,6 +19,7 @@ import axios from "axios";
 import UpdateTicketService from "../TicketServices/UpdateTicketService";
 import fs from "fs";
 import getContactId from "../../utils/GetContactId";
+import { SendWhatsAppMessage } from "../../helpers/SendWhatsAppMessage";
 
 export const provider = async (
   ticket: Ticket,
@@ -106,7 +107,8 @@ export const provider = async (
             };
             try {
               await sleep(2000);
-              await wbot.sendMessage(
+              await SendWhatsAppMessage(
+                wbot,
                 getContactId(ticket.contact, ticket.isGroup),
                 textMessage
               );
@@ -142,7 +144,8 @@ export const provider = async (
                       };
                       try {
                         await sleep(2000);
-                        await wbot.sendMessage(
+                        await SendWhatsAppMessage(
+                          wbot,
                           getContactId(ticket.contact, ticket.isGroup),
                           textMessage
                         );
@@ -197,7 +200,8 @@ export const provider = async (
                             contact
                           )
                         };
-                        await wbot.sendMessage(
+                        await SendWhatsAppMessage(
+                          wbot,
                           getContactId(ticket.contact, ticket.isGroup),
                           textMessage
                         );
@@ -208,7 +212,8 @@ export const provider = async (
                           )
                         };
                         await sleep(2000);
-                        await wbot.sendMessage(
+                        await SendWhatsAppMessage(
+                          wbot,
                           getContactId(ticket.contact, ticket.isGroup),
                           bodyBoleto
                         );
@@ -216,7 +221,8 @@ export const provider = async (
                           text: formatBody(`${linhadig}`, contact)
                         };
                         await sleep(2000);
-                        await wbot.sendMessage(
+                        await SendWhatsAppMessage(
+                          wbot,
                           getContactId(ticket.contact, ticket.isGroup),
                           bodyLinha
                         );
@@ -228,7 +234,8 @@ export const provider = async (
                             )
                           };
                           await sleep(2000);
-                          await wbot.sendMessage(
+                          await SendWhatsAppMessage(
+                            wbot,
                             getContactId(ticket.contact, ticket.isGroup),
                             bodyPdf
                           );
@@ -236,7 +243,8 @@ export const provider = async (
                             text: formatBody(`${qrcode}`, contact)
                           };
                           await sleep(2000);
-                          await wbot.sendMessage(
+                          await SendWhatsAppMessage(
+                            wbot,
                             getContactId(ticket.contact, ticket.isGroup),
                             bodyqrcode
                           );
@@ -260,7 +268,8 @@ export const provider = async (
                         const bodyPdfQr = {
                           text: formatBody(`${bodyPdf}`, contact)
                         };
-                        await wbot.sendMessage(
+                        await SendWhatsAppMessage(
+                          wbot,
                           getContactId(ticket.contact, ticket.isGroup),
                           bodyPdfQr
                         );
@@ -303,7 +312,8 @@ export const provider = async (
                             )
                           };
                           await sleep(2000);
-                          await wbot.sendMessage(
+                          await SendWhatsAppMessage(
+                            wbot,
                             getContactId(ticket.contact, ticket.isGroup),
                             bodyBloqueio
                           );
@@ -314,7 +324,8 @@ export const provider = async (
                             )
                           };
                           await sleep(2000);
-                          await wbot.sendMessage(
+                          await SendWhatsAppMessage(
+                            wbot,
                             getContactId(ticket.contact, ticket.isGroup),
                             bodyqrcode
                           );
@@ -335,7 +346,8 @@ export const provider = async (
                                 )
                               };
                               await sleep(2000);
-                              await wbot.sendMessage(
+                              await SendWhatsAppMessage(
+                                wbot,
                                 getContactId(ticket.contact, ticket.isGroup),
                                 bodyLiberado
                               );
@@ -346,7 +358,8 @@ export const provider = async (
                                 )
                               };
                               await sleep(2000);
-                              await wbot.sendMessage(
+                              await SendWhatsAppMessage(
+                                wbot,
                                 getContactId(ticket.contact, ticket.isGroup),
                                 bodyqrcode
                               );
@@ -358,7 +371,8 @@ export const provider = async (
                                   contact
                                 )
                               };
-                              await wbot.sendMessage(
+                              await SendWhatsAppMessage(
+                                wbot,
                                 getContactId(ticket.contact, ticket.isGroup),
                                 bodyfinaliza
                               );
@@ -372,7 +386,8 @@ export const provider = async (
                           )
                         };
                         await sleep(12000);
-                        await wbot.sendMessage(
+                        await SendWhatsAppMessage(
+                          wbot,
                           getContactId(ticket.contact, ticket.isGroup),
                           bodyfinaliza
                         );
@@ -402,7 +417,8 @@ export const provider = async (
                         )
                       };
                       await sleep(2000);
-                      await wbot.sendMessage(
+                      await SendWhatsAppMessage(
+                        wbot,
                         getContactId(ticket.contact, ticket.isGroup),
                         bodyBoleto
                       );
@@ -418,7 +434,8 @@ export const provider = async (
                     contact
                   )
                 };
-                await wbot.sendMessage(
+                await SendWhatsAppMessage(
+                  wbot,
                   getContactId(ticket.contact, ticket.isGroup),
                   bodyfinaliza
                 );
@@ -431,7 +448,8 @@ export const provider = async (
               )
             };
             await sleep(2000);
-            await wbot.sendMessage(
+            await SendWhatsAppMessage(
+              wbot,
               getContactId(ticket.contact, ticket.isGroup),
               body
             );
@@ -453,7 +471,8 @@ export const provider = async (
             };
             try {
               await sleep(2000);
-              await wbot.sendMessage(
+              await SendWhatsAppMessage(
+                wbot,
                 getContactId(ticket.contact, ticket.isGroup),
                 body
               );
@@ -487,7 +506,8 @@ export const provider = async (
                     )
                   };
                   await sleep(2000);
-                  await wbot.sendMessage(
+                  await SendWhatsAppMessage(
+                    wbot,
                     getContactId(ticket.contact, ticket.isGroup),
                     body
                   );
@@ -499,7 +519,8 @@ export const provider = async (
                     )
                   };
                   await sleep(2000);
-                  await wbot.sendMessage(
+                  await SendWhatsAppMessage(
+                    wbot,
                     getContactId(ticket.contact, ticket.isGroup),
                     body
                   );
@@ -527,7 +548,8 @@ export const provider = async (
                           )
                         };
                         await sleep(2000);
-                        await wbot.sendMessage(
+                        await SendWhatsAppMessage(
+                          wbot,
                           getContactId(ticket.contact, ticket.isGroup),
                           body
                         );
@@ -584,7 +606,8 @@ export const provider = async (
                               )
                             };
                             await sleep(2000);
-                            await wbot.sendMessage(
+                            await SendWhatsAppMessage(
+                              wbot,
                               getContactId(ticket.contact, ticket.isGroup),
                               bodyBoleto
                             );
@@ -615,7 +638,8 @@ export const provider = async (
                                     )
                                   };
                                   await sleep(2000);
-                                  await wbot.sendMessage(
+                                  await SendWhatsAppMessage(
+                                    wbot,
                                     getContactId(
                                       ticket.contact,
                                       ticket.isGroup
@@ -626,7 +650,8 @@ export const provider = async (
                                     text: formatBody(`${payload}`, contact)
                                   };
                                   await sleep(2000);
-                                  await wbot.sendMessage(
+                                  await SendWhatsAppMessage(
+                                    wbot,
                                     getContactId(
                                       ticket.contact,
                                       ticket.isGroup
@@ -674,7 +699,8 @@ export const provider = async (
                                           )
                                         };
                                         await sleep(2000);
-                                        await wbot.sendMessage(
+                                        await SendWhatsAppMessage(
+                                          wbot,
                                           getContactId(
                                             ticket.contact,
                                             ticket.isGroup
@@ -682,7 +708,8 @@ export const provider = async (
                                           bodycodigo
                                         );
                                         await sleep(2000);
-                                        await wbot.sendMessage(
+                                        await SendWhatsAppMessage(
+                                          wbot,
                                           getContactId(
                                             ticket.contact,
                                             ticket.isGroup
@@ -696,7 +723,8 @@ export const provider = async (
                                           )
                                         };
                                         await sleep(2000);
-                                        await wbot.sendMessage(
+                                        await SendWhatsAppMessage(
+                                          wbot,
                                           getContactId(
                                             ticket.contact,
                                             ticket.isGroup
@@ -717,7 +745,8 @@ export const provider = async (
                                           )
                                         };
                                         await sleep(2000);
-                                        await wbot.sendMessage(
+                                        await SendWhatsAppMessage(
+                                          wbot,
                                           getContactId(
                                             ticket.contact,
                                             ticket.isGroup
@@ -739,7 +768,8 @@ export const provider = async (
                                         )
                                       };
                                       await sleep(2000);
-                                      await wbot.sendMessage(
+                                      await SendWhatsAppMessage(
+                                        wbot,
                                         getContactId(
                                           ticket.contact,
                                           ticket.isGroup
@@ -762,7 +792,8 @@ export const provider = async (
                                   )
                                 };
                                 await sleep(2000);
-                                await wbot.sendMessage(
+                                await SendWhatsAppMessage(
+                                  wbot,
                                   getContactId(ticket.contact, ticket.isGroup),
                                   body
                                 );
@@ -776,7 +807,8 @@ export const provider = async (
                               )
                             };
                             await sleep(2000);
-                            await wbot.sendMessage(
+                            await SendWhatsAppMessage(
+                              wbot,
                               getContactId(ticket.contact, ticket.isGroup),
                               body
                             );
@@ -817,7 +849,8 @@ export const provider = async (
                           )
                         };
                         await sleep(2000);
-                        await wbot.sendMessage(
+                        await SendWhatsAppMessage(
+                          wbot,
                           getContactId(ticket.contact, ticket.isGroup),
                           body
                         );
@@ -828,7 +861,8 @@ export const provider = async (
                           )
                         };
                         await sleep(2000);
-                        await wbot.sendMessage(
+                        await SendWhatsAppMessage(
+                          wbot,
                           getContactId(ticket.contact, ticket.isGroup),
                           bodyBoleto
                         );
@@ -858,7 +892,8 @@ export const provider = async (
                                 )
                               };
                               await sleep(2000);
-                              await wbot.sendMessage(
+                              await SendWhatsAppMessage(
+                                wbot,
                                 getContactId(ticket.contact, ticket.isGroup),
                                 bodyPixCP
                               );
@@ -866,7 +901,8 @@ export const provider = async (
                                 text: formatBody(`${payload}`, contact)
                               };
                               await sleep(2000);
-                              await wbot.sendMessage(
+                              await SendWhatsAppMessage(
+                                wbot,
                                 getContactId(ticket.contact, ticket.isGroup),
                                 bodyPix
                               );
@@ -911,7 +947,8 @@ export const provider = async (
                                       )
                                     };
                                     await sleep(2000);
-                                    await wbot.sendMessage(
+                                    await SendWhatsAppMessage(
+                                      wbot,
                                       getContactId(
                                         ticket.contact,
                                         ticket.isGroup
@@ -919,7 +956,8 @@ export const provider = async (
                                       bodycodigo
                                     );
                                     await sleep(2000);
-                                    await wbot.sendMessage(
+                                    await SendWhatsAppMessage(
+                                      wbot,
                                       getContactId(
                                         ticket.contact,
                                         ticket.isGroup
@@ -933,7 +971,8 @@ export const provider = async (
                                       )
                                     };
                                     await sleep(2000);
-                                    await wbot.sendMessage(
+                                    await SendWhatsAppMessage(
+                                      wbot,
                                       getContactId(
                                         ticket.contact,
                                         ticket.isGroup
@@ -953,7 +992,8 @@ export const provider = async (
                                       )
                                     };
                                     await sleep(2000);
-                                    await wbot.sendMessage(
+                                    await SendWhatsAppMessage(
+                                      wbot,
                                       getContactId(
                                         ticket.contact,
                                         ticket.isGroup
@@ -983,7 +1023,8 @@ export const provider = async (
                         )
                       };
                       await sleep(2000);
-                      await wbot.sendMessage(
+                      await SendWhatsAppMessage(
+                        wbot,
                         getContactId(ticket.contact, ticket.isGroup),
                         body
                       );
@@ -998,7 +1039,8 @@ export const provider = async (
                   )
                 };
                 await sleep(2000);
-                await wbot.sendMessage(
+                await SendWhatsAppMessage(
+                  wbot,
                   getContactId(ticket.contact, ticket.isGroup),
                   body
                 );
@@ -1038,7 +1080,8 @@ export const provider = async (
             };
             try {
               await sleep(2000);
-              await wbot.sendMessage(
+              await SendWhatsAppMessage(
+                wbot,
                 getContactId(ticket.contact, ticket.isGroup),
                 body
               );
@@ -1073,7 +1116,8 @@ export const provider = async (
                     )
                   };
                   await sleep(2000);
-                  await wbot.sendMessage(
+                  await SendWhatsAppMessage(
+                    wbot,
                     getContactId(ticket.contact, ticket.isGroup),
                     body
                   );
@@ -1087,7 +1131,8 @@ export const provider = async (
                   };
                   try {
                     await sleep(2000);
-                    await wbot.sendMessage(
+                    await SendWhatsAppMessage(
+                      wbot,
                       getContactId(ticket.contact, ticket.isGroup),
                       body
                     );
@@ -1108,7 +1153,8 @@ export const provider = async (
                     )
                   };
                   await sleep(2000);
-                  await wbot.sendMessage(
+                  await SendWhatsAppMessage(
+                    wbot,
                     getContactId(ticket.contact, ticket.isGroup),
                     body
                   );
@@ -1217,7 +1263,8 @@ export const provider = async (
                                 contact
                               )
                             };
-                            await wbot.sendMessage(
+                            await SendWhatsAppMessage(
+                              wbot,
                               getContactId(ticket.contact, ticket.isGroup),
                               bodyBoletoPix
                             );
@@ -1228,7 +1275,8 @@ export const provider = async (
                               )
                             };
                             await sleep(2000);
-                            await wbot.sendMessage(
+                            await SendWhatsAppMessage(
+                              wbot,
                               getContactId(ticket.contact, ticket.isGroup),
                               body_linhadigitavel
                             );
@@ -1236,7 +1284,8 @@ export const provider = async (
                             const body_linha_digitavel = {
                               text: formatBody(`${linha_digitavel}`, contact)
                             };
-                            await wbot.sendMessage(
+                            await SendWhatsAppMessage(
+                              wbot,
                               getContactId(ticket.contact, ticket.isGroup),
                               body_linha_digitavel
                             );
@@ -1247,7 +1296,8 @@ export const provider = async (
                               )
                             };
                             await sleep(2000);
-                            await wbot.sendMessage(
+                            await SendWhatsAppMessage(
+                              wbot,
                               getContactId(ticket.contact, ticket.isGroup),
                               body_pix
                             );
@@ -1255,7 +1305,8 @@ export const provider = async (
                             const body_pix_dig = {
                               text: formatBody(`${pix}`, contact)
                             };
-                            await wbot.sendMessage(
+                            await SendWhatsAppMessage(
+                              wbot,
                               getContactId(ticket.contact, ticket.isGroup),
                               body_pix_dig
                             );
@@ -1263,7 +1314,8 @@ export const provider = async (
                               text: formatBody("QR CODE do *PIX*", contact)
                             };
                             await sleep(2000);
-                            await wbot.sendMessage(
+                            await SendWhatsAppMessage(
+                              wbot,
                               getContactId(ticket.contact, ticket.isGroup),
                               body_pixqr
                             );
@@ -1310,7 +1362,8 @@ export const provider = async (
                                     )
                                   };
                                   await sleep(2000);
-                                  await wbot.sendMessage(
+                                  await SendWhatsAppMessage(
+                                    wbot,
                                     getContactId(
                                       ticket.contact,
                                       ticket.isGroup
@@ -1324,7 +1377,8 @@ export const provider = async (
                                     )
                                   };
                                   await sleep(2000);
-                                  await wbot.sendMessage(
+                                  await SendWhatsAppMessage(
+                                    wbot,
                                     getContactId(
                                       ticket.contact,
                                       ticket.isGroup
@@ -1381,7 +1435,8 @@ export const provider = async (
                                                 )
                                               };
                                               await sleep(2000);
-                                              await wbot.sendMessage(
+                                              await SendWhatsAppMessage(
+                                                wbot,
                                                 getContactId(
                                                   ticket.contact,
                                                   ticket.isGroup
@@ -1395,7 +1450,8 @@ export const provider = async (
                                                 )
                                               };
                                               await sleep(2000);
-                                              await wbot.sendMessage(
+                                              await SendWhatsAppMessage(
+                                                wbot,
                                                 getContactId(
                                                   ticket.contact,
                                                   ticket.isGroup
@@ -1409,7 +1465,8 @@ export const provider = async (
                                                 )
                                               };
                                               await sleep(2000);
-                                              await wbot.sendMessage(
+                                              await SendWhatsAppMessage(
+                                                wbot,
                                                 getContactId(
                                                   ticket.contact,
                                                   ticket.isGroup
@@ -1445,7 +1502,8 @@ export const provider = async (
                                           )
                                         };
                                         await sleep(2000);
-                                        await wbot.sendMessage(
+                                        await SendWhatsAppMessage(
+                                          wbot,
                                           getContactId(
                                             ticket.contact,
                                             ticket.isGroup
@@ -1453,7 +1511,8 @@ export const provider = async (
                                           bodyerro
                                         );
                                         await sleep(2000);
-                                        await wbot.sendMessage(
+                                        await SendWhatsAppMessage(
+                                          wbot,
                                           getContactId(
                                             ticket.contact,
                                             ticket.isGroup
@@ -1467,7 +1526,8 @@ export const provider = async (
                                           )
                                         };
                                         await sleep(2000);
-                                        await wbot.sendMessage(
+                                        await SendWhatsAppMessage(
+                                          wbot,
                                           getContactId(
                                             ticket.contact,
                                             ticket.isGroup
@@ -1484,7 +1544,8 @@ export const provider = async (
                                         )
                                       };
                                       await sleep(2000);
-                                      await wbot.sendMessage(
+                                      await SendWhatsAppMessage(
+                                        wbot,
                                         getContactId(
                                           ticket.contact,
                                           ticket.isGroup
@@ -1500,7 +1561,8 @@ export const provider = async (
                                     )
                                   };
                                   await sleep(8000);
-                                  await wbot.sendMessage(
+                                  await SendWhatsAppMessage(
+                                    wbot,
                                     getContactId(
                                       ticket.contact,
                                       ticket.isGroup
@@ -1524,7 +1586,8 @@ export const provider = async (
                                   )
                                 };
                                 await sleep(2000);
-                                await wbot.sendMessage(
+                                await SendWhatsAppMessage(
+                                  wbot,
                                   getContactId(ticket.contact, ticket.isGroup),
                                   bodyerro
                                 );
@@ -1538,7 +1601,8 @@ export const provider = async (
                               )
                             };
                             await sleep(2000);
-                            await wbot.sendMessage(
+                            await SendWhatsAppMessage(
+                              wbot,
                               getContactId(ticket.contact, ticket.isGroup),
                               bodyBoleto
                             );
@@ -1549,7 +1613,8 @@ export const provider = async (
                               )
                             };
                             await sleep(2000);
-                            await wbot.sendMessage(
+                            await SendWhatsAppMessage(
+                              wbot,
                               getContactId(ticket.contact, ticket.isGroup),
                               body
                             );
@@ -1557,7 +1622,8 @@ export const provider = async (
                             const body_linha_digitavel = {
                               text: formatBody(`${linha_digitavel}`, contact)
                             };
-                            await wbot.sendMessage(
+                            await SendWhatsAppMessage(
+                              wbot,
                               getContactId(ticket.contact, ticket.isGroup),
                               body_linha_digitavel
                             );
@@ -1595,7 +1661,8 @@ export const provider = async (
                                     )
                                   };
                                   await sleep(2000);
-                                  await wbot.sendMessage(
+                                  await SendWhatsAppMessage(
+                                    wbot,
                                     getContactId(
                                       ticket.contact,
                                       ticket.isGroup
@@ -1609,7 +1676,8 @@ export const provider = async (
                                     )
                                   };
                                   await sleep(2000);
-                                  await wbot.sendMessage(
+                                  await SendWhatsAppMessage(
+                                    wbot,
                                     getContactId(
                                       ticket.contact,
                                       ticket.isGroup
@@ -1666,7 +1734,8 @@ export const provider = async (
                                             };
                                             if (tipo === "success") {
                                               await sleep(2000);
-                                              await wbot.sendMessage(
+                                              await SendWhatsAppMessage(
+                                                wbot,
                                                 getContactId(
                                                   ticket.contact,
                                                   ticket.isGroup
@@ -1680,7 +1749,8 @@ export const provider = async (
                                                 )
                                               };
                                               await sleep(2000);
-                                              await wbot.sendMessage(
+                                              await SendWhatsAppMessage(
+                                                wbot,
                                                 getContactId(
                                                   ticket.contact,
                                                   ticket.isGroup
@@ -1694,7 +1764,8 @@ export const provider = async (
                                                 )
                                               };
                                               await sleep(2000);
-                                              await wbot.sendMessage(
+                                              await SendWhatsAppMessage(
+                                                wbot,
                                                 getContactId(
                                                   ticket.contact,
                                                   ticket.isGroup
@@ -1710,7 +1781,8 @@ export const provider = async (
                                               });
                                             } else {
                                               await sleep(2000);
-                                              await wbot.sendMessage(
+                                              await SendWhatsAppMessage(
+                                                wbot,
                                                 getContactId(
                                                   ticket.contact,
                                                   ticket.isGroup
@@ -1724,7 +1796,8 @@ export const provider = async (
                                                 )
                                               };
                                               await sleep(2000);
-                                              await wbot.sendMessage(
+                                              await SendWhatsAppMessage(
+                                                wbot,
                                                 getContactId(
                                                   ticket.contact,
                                                   ticket.isGroup
@@ -1738,7 +1811,8 @@ export const provider = async (
                                                 )
                                               };
                                               await sleep(2000);
-                                              await wbot.sendMessage(
+                                              await SendWhatsAppMessage(
+                                                wbot,
                                                 getContactId(
                                                   ticket.contact,
                                                   ticket.isGroup
@@ -1752,7 +1826,8 @@ export const provider = async (
                                                 )
                                               };
                                               await sleep(2000);
-                                              await wbot.sendMessage(
+                                              await SendWhatsAppMessage(
+                                                wbot,
                                                 getContactId(
                                                   ticket.contact,
                                                   ticket.isGroup
@@ -1780,7 +1855,8 @@ export const provider = async (
                                           )
                                         };
                                         await sleep(2000);
-                                        await wbot.sendMessage(
+                                        await SendWhatsAppMessage(
+                                          wbot,
                                           getContactId(
                                             ticket.contact,
                                             ticket.isGroup
@@ -1797,7 +1873,8 @@ export const provider = async (
                                         )
                                       };
                                       await sleep(2000);
-                                      await wbot.sendMessage(
+                                      await SendWhatsAppMessage(
+                                        wbot,
                                         getContactId(
                                           ticket.contact,
                                           ticket.isGroup
@@ -1813,7 +1890,8 @@ export const provider = async (
                                     )
                                   };
                                   await sleep(2000);
-                                  await wbot.sendMessage(
+                                  await SendWhatsAppMessage(
+                                    wbot,
                                     getContactId(
                                       ticket.contact,
                                       ticket.isGroup
@@ -1837,7 +1915,8 @@ export const provider = async (
                                   )
                                 };
                                 await sleep(2000);
-                                await wbot.sendMessage(
+                                await SendWhatsAppMessage(
+                                  wbot,
                                   getContactId(ticket.contact, ticket.isGroup),
                                   bodyerro
                                 );
@@ -1863,7 +1942,8 @@ export const provider = async (
                   )
                 };
                 await sleep(2000);
-                await wbot.sendMessage(
+                await SendWhatsAppMessage(
+                  wbot,
                   getContactId(ticket.contact, ticket.isGroup),
                   body
                 );
@@ -1876,7 +1956,8 @@ export const provider = async (
               )
             };
             await sleep(2000);
-            await wbot.sendMessage(
+            await SendWhatsAppMessage(
+              wbot,
               getContactId(ticket.contact, ticket.isGroup),
               body
             );
@@ -1981,7 +2062,8 @@ export const provider = async (
             };
             try {
               await sleep(2000);
-              await wbot.sendMessage(
+              await SendWhatsAppMessage(
+                wbot,
                 getContactId(ticket.contact, ticket.isGroup),
                 body
               );
@@ -2015,7 +2097,8 @@ export const provider = async (
                     )
                   };
                   await sleep(2000);
-                  await wbot.sendMessage(
+                  await SendWhatsAppMessage(
+                    wbot,
                     getContactId(ticket.contact, ticket.isGroup),
                     body
                   );
@@ -2029,7 +2112,8 @@ export const provider = async (
                   };
                   try {
                     await sleep(2000);
-                    await wbot.sendMessage(
+                    await SendWhatsAppMessage(
+                      wbot,
                       getContactId(ticket.contact, ticket.isGroup),
                       body
                     );
@@ -2050,7 +2134,8 @@ export const provider = async (
                     )
                   };
                   await sleep(2000);
-                  await wbot.sendMessage(
+                  await SendWhatsAppMessage(
+                    wbot,
                     getContactId(ticket.contact, ticket.isGroup),
                     body
                   );
@@ -2088,7 +2173,8 @@ export const provider = async (
                           )
                         };
                         await sleep(2000);
-                        await wbot.sendMessage(
+                        await SendWhatsAppMessage(
+                          wbot,
                           getContactId(ticket.contact, ticket.isGroup),
                           bodyPdf
                         );
@@ -2099,7 +2185,8 @@ export const provider = async (
                           )
                         };
                         await sleep(2000);
-                        await wbot.sendMessage(
+                        await SendWhatsAppMessage(
+                          wbot,
                           getContactId(ticket.contact, ticket.isGroup),
                           bodyqrcode
                         );
@@ -2151,7 +2238,8 @@ export const provider = async (
 
                                   if (tipo === "success") {
                                     await sleep(2000);
-                                    await wbot.sendMessage(
+                                    await SendWhatsAppMessage(
+                                      wbot,
                                       getContactId(
                                         ticket.contact,
                                         ticket.isGroup
@@ -2165,7 +2253,8 @@ export const provider = async (
                                       )
                                     };
                                     await sleep(2000);
-                                    await wbot.sendMessage(
+                                    await SendWhatsAppMessage(
+                                      wbot,
                                       getContactId(
                                         ticket.contact,
                                         ticket.isGroup
@@ -2179,7 +2268,8 @@ export const provider = async (
                                       )
                                     };
                                     await sleep(2000);
-                                    await wbot.sendMessage(
+                                    await SendWhatsAppMessage(
+                                      wbot,
                                       getContactId(
                                         ticket.contact,
                                         ticket.isGroup
@@ -2193,7 +2283,8 @@ export const provider = async (
                                     });
                                   } else {
                                     await sleep(2000);
-                                    await wbot.sendMessage(
+                                    await SendWhatsAppMessage(
+                                      wbot,
                                       getContactId(
                                         ticket.contact,
                                         ticket.isGroup
@@ -2207,7 +2298,8 @@ export const provider = async (
                                       )
                                     };
                                     await sleep(2000);
-                                    await wbot.sendMessage(
+                                    await SendWhatsAppMessage(
+                                      wbot,
                                       getContactId(
                                         ticket.contact,
                                         ticket.isGroup
@@ -2221,7 +2313,8 @@ export const provider = async (
                                       )
                                     };
                                     await sleep(2000);
-                                    await wbot.sendMessage(
+                                    await SendWhatsAppMessage(
+                                      wbot,
                                       getContactId(
                                         ticket.contact,
                                         ticket.isGroup
@@ -2235,7 +2328,8 @@ export const provider = async (
                                       )
                                     };
                                     await sleep(2000);
-                                    await wbot.sendMessage(
+                                    await SendWhatsAppMessage(
+                                      wbot,
                                       getContactId(
                                         ticket.contact,
                                         ticket.isGroup
@@ -2261,12 +2355,14 @@ export const provider = async (
                                 )
                               };
                               await sleep(2000);
-                              await wbot.sendMessage(
+                              await SendWhatsAppMessage(
+                                wbot,
                                 getContactId(ticket.contact, ticket.isGroup),
                                 bodyerro
                               );
                               await sleep(2000);
-                              await wbot.sendMessage(
+                              await SendWhatsAppMessage(
+                                wbot,
                                 getContactId(ticket.contact, ticket.isGroup),
                                 body_mensagem
                               );
@@ -2277,7 +2373,8 @@ export const provider = async (
                                 )
                               };
                               await sleep(2000);
-                              await wbot.sendMessage(
+                              await SendWhatsAppMessage(
+                                wbot,
                                 getContactId(ticket.contact, ticket.isGroup),
                                 bodyerroatendente
                               );
@@ -2291,7 +2388,8 @@ export const provider = async (
                               )
                             };
                             await sleep(2000);
-                            await wbot.sendMessage(
+                            await SendWhatsAppMessage(
+                              wbot,
                               getContactId(ticket.contact, ticket.isGroup),
                               bodyerro
                             );
@@ -2304,7 +2402,8 @@ export const provider = async (
                           )
                         };
                         await sleep(2000);
-                        await wbot.sendMessage(
+                        await SendWhatsAppMessage(
+                          wbot,
                           getContactId(ticket.contact, ticket.isGroup),
                           bodysembloqueio
                         );
@@ -2315,7 +2414,8 @@ export const provider = async (
                           )
                         };
                         await sleep(2000);
-                        await wbot.sendMessage(
+                        await SendWhatsAppMessage(
+                          wbot,
                           getContactId(ticket.contact, ticket.isGroup),
                           bodyfinaliza
                         );
@@ -2336,7 +2436,8 @@ export const provider = async (
                         )
                       };
                       await sleep(2000);
-                      await wbot.sendMessage(
+                      await SendWhatsAppMessage(
+                        wbot,
                         getContactId(ticket.contact, ticket.isGroup),
                         bodyerro
                       );
@@ -2351,7 +2452,8 @@ export const provider = async (
                   )
                 };
                 await sleep(2000);
-                await wbot.sendMessage(
+                await SendWhatsAppMessage(
+                  wbot,
                   getContactId(ticket.contact, ticket.isGroup),
                   body
                 );
@@ -2364,7 +2466,8 @@ export const provider = async (
               )
             };
             await sleep(2000);
-            await wbot.sendMessage(
+            await SendWhatsAppMessage(
+              wbot,
               getContactId(ticket.contact, ticket.isGroup),
               body
             );
