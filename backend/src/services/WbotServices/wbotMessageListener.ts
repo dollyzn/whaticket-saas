@@ -666,7 +666,8 @@ const handleOpenAi = async (
       systemPrompt: prompt,
       messageHistory,
       userMessage,
-      contactName: contact.name
+      contactName: contact.name,
+      queueName: ticket.queue?.name
     });
 
     const response = await openai.chat.completions.create({
@@ -813,17 +814,22 @@ const buildMessageArray = ({
   systemPrompt,
   messageHistory,
   userMessage,
-  contactName
+  contactName,
+  queueName
 }: {
   systemPrompt: Prompt;
   messageHistory: Message[];
   userMessage: string;
   contactName: string;
+  queueName?: string;
 }): OpenAI.Chat.Completions.ChatCompletionMessageParam[] => {
   const systemMessage = {
     role: "system" as const,
-    content: `Mensagens com \`name\` começando com 'Atendente' foram escritas por pessoas humanas do time de suporte.
-    # IMPORTANTE: Para transferir o atendimento a um humano/atendente inicie a resposta com exatamente: Ação: Transferir para o setor de atendimento
+    content: `# IMPORTANTE: Para transferir o atendimento a um humano/atendente inicie a resposta com exatamente: Ação: Transferir para o setor de atendimento
+    - Mensagens com \`name\` começando com 'Atendente' foram escritas por pessoas humanas do time de suporte.
+    - A fila selecionada para o atendimento / suposta intenção do cliente é: ${
+      queueName || "Nenhuma"
+    }
     Instruções:
     ${systemPrompt.prompt}`
   };
