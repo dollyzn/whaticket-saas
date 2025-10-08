@@ -869,7 +869,7 @@ const buildMessageArray = ({
 
       const name = msg.fromMe
         ? getAssistantName(extractedName, sanitizeName(systemPrompt.name))
-        : sanitizeName(contactName);
+        : sanitizeName(contactName) || "Cliente";
 
       return {
         role: msg.fromMe ? "assistant" : "user",
@@ -884,7 +884,7 @@ const buildMessageArray = ({
     {
       role: "user" as const,
       content: userMessage,
-      name: sanitizeName(contactName)
+      name: sanitizeName(contactName) || "Cliente"
     }
   ];
 };
