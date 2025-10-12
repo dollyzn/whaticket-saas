@@ -34,6 +34,7 @@ import UserRating from "../../models/UserRating";
 import SendWhatsAppMessage from "./SendWhatsAppMessage";
 import { SendWhatsAppMessage as SendWhatsAppMessageHelper } from "../../helpers/SendWhatsAppMessage";
 import moment from "moment";
+import "moment/locale/pt-br";
 import Queue from "../../models/Queue";
 import QueueOption from "../../models/QueueOption";
 import FindOrCreateATicketTrakingService from "../TicketServices/FindOrCreateATicketTrakingService";
@@ -826,7 +827,9 @@ const buildMessageArray = ({
   const systemMessage = {
     role: "system" as const,
     content: `# IMPORTANTE: Para transferir o atendimento a um humano/atendente inicie a resposta com exatamente: Ação: Transferir para o setor de atendimento
-    - Mensagens com \`name\` começando com 'Atendente' foram escritas por pessoas humanas do time de suporte.
+    - Hoje é: ${moment()
+      .locale("pt-br")
+      .format("dddd, D [de] MMMM [de] YYYY [às] HH:mm:ss")}
     - A fila selecionada para o atendimento / suposta intenção do cliente é: ${
       queueName || "Nenhuma"
     }
