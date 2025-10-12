@@ -1238,12 +1238,20 @@ const verifyQueue = async (
     }
     //inicia integração openai
     if (!msg.key.fromMe && !ticket.isGroup && !isNil(queues[0]?.promptId)) {
-      await handleOpenAi(msg, wbot, ticket, contact, mediaSent);
+      const debouncedHandleOpenAi = debounce(
+        async () => {
+          await handleOpenAi(msg, wbot, ticket, contact, mediaSent);
 
-      await ticket.update({
-        useIntegration: true,
-        promptId: queues[0]?.promptId
-      });
+          await ticket.update({
+            useIntegration: true,
+            promptId: queues[0]?.promptId
+          });
+        },
+        5000,
+        ticket.id
+      );
+      debouncedHandleOpenAi();
+
       // return;
     }
 
@@ -1413,7 +1421,14 @@ const verifyQueue = async (
         !isNil(choosenQueue?.promptId)
       ) {
         if (!queue.greetingMessage) {
-          await handleOpenAi(msg, wbot, ticket, contact, mediaSent);
+          const debouncedHandleOpenAi = debounce(
+            async () => {
+              await handleOpenAi(msg, wbot, ticket, contact, mediaSent);
+            },
+            5000,
+            ticket.id
+          );
+          debouncedHandleOpenAi();
         }
 
         await ticket.update({
@@ -2381,7 +2396,14 @@ const handleMessage = async (
       ticket.useIntegration &&
       ticket.queueId
     ) {
-      await handleOpenAi(msg, wbot, ticket, contact, mediaSent);
+      const debouncedHandleOpenAi = debounce(
+        async () => {
+          await handleOpenAi(msg, wbot, ticket, contact, mediaSent);
+        },
+        5000,
+        ticket.id
+      );
+      debouncedHandleOpenAi();
     }
 
     if (
