@@ -2556,6 +2556,40 @@ const handleMessage = async (
   }
 };
 
+const handleMsgRevoke = async (msg: WAMessageUpdate) => {
+  const io = getIO();
+  try {
+    const messageId = msg?.key?.id;
+    if (!messageId) return;
+
+    const messageToUpdate = await Message.findByPk(messageId, {
+      include: [
+        "contact",
+        {
+          model: Message,
+          as: "quotedMsg",
+          include: ["contact"]
+        }
+      ]
+    });
+
+    if (!messageToUpdate) return;
+
+    await messageToUpdate.update({ isDeleted: true });
+
+    io.to(messageToUpdate.ticketId.toString()).emit(
+      `company-${messageToUpdate.companyId}-appMessage`,
+      {
+        action: "update",
+        message: messageToUpdate
+      }
+    );
+  } catch (err) {
+    Sentry.captureException(err);
+    logger.error(`Error handling message revoke. Err: ${err}`);
+  }
+};
+
 const handleMsgAck = async (
   msg: WAMessage,
   chat: number | null | undefined
@@ -2704,7 +2738,20 @@ const wbotMessageListener = async (
 
       // Adiciona cada mensagem à fila, limitando concorrência
       for (const msg of messageUpdate) {
-        ackQueue.add(() => handleMsgAck(msg, msg.update.status));
+        if (
+          msg.update?.message === null &&
+          msg.update?.messageStubType === WAMessageStubType.REVOKE
+        ) {
+          ackQueue.add(() => handleMsgRevoke(msg));
+          continue;
+        }
+
+        if (
+          typeof msg.update?.status !== "undefined" &&
+          msg.update?.status !== null
+        ) {
+          ackQueue.add(() => handleMsgAck(msg, msg.update.status));
+        }
       }
     });
 

@@ -2108,10 +2108,10 @@ babel-runtime@^6.11.6:
     core-js "^2.4.0"
     regenerator-runtime "^0.11.0"
 
-"baileys@npm:@yupra/baileys":
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/@yupra/baileys/-/baileys-2.0.2.tgz#4a7ed95989fd0a7aee84ca34a5fdc19bee650d16"
-  integrity sha512-ZtDCUJ01FjQRWTillXiGyHjlZQMKzHisVpTIWK7Fksfjb+yCFlaBKRxAFh5PfJe/n0xhuN1xh/MHcV8Tge5v4A==
+"baileys@npm:wileys":
+  version "0.0.5"
+  resolved "https://registry.yarnpkg.com/wileys/-/wileys-0.0.5.tgz#3ab72c5d2634152eef20946a340f546f9ea9cdc0"
+  integrity sha512-s84zJyooVSGMsm9z6868fbPIamy+NvEPH/q+PVn8oKumGfg2mmu4U0egwI0+VuIRsZ02AtSCedQfkkYFE2X33g==
   dependencies:
     "@adiwajshing/keyed-db" "^0.2.4"
     "@cacheable/node-cache" "^1.4.0"
@@ -5718,6 +5718,11 @@ lru-cache@^10.2.0, lru-cache@^10.2.2:
   version "10.4.3"
   resolved "https://registry.yarnpkg.com/lru-cache/-/lru-cache-10.4.3.tgz#410fc8a17b70e598013df257c2446b7f3383f119"
   integrity sha512-JNAzZcXrCt42VGLuYz0zfAzDfAvJWW6AfYlDBQyDV5DClI2m5sAmK+OIO7s59XfsRsWHp02jAJrRadPRGTt6SQ==
+
+lru-cache@^11.2.2:
+  version "11.2.2"
+  resolved "https://registry.yarnpkg.com/lru-cache/-/lru-cache-11.2.2.tgz#40fd37edffcfae4b2940379c0722dc6eeaa75f24"
+  integrity sha512-F9ODfyqML2coTIsQpSkRHnLSZMtkU8Q+mSfcaIyKwy58u+8k5nvAYeiNhsyMARvzNcXJ9QfWVrcPsC9e9rAxtg==
 
 lru-cache@^5.1.1:
   version "5.1.1"

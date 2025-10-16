@@ -6,7 +6,9 @@ import makeWASocket, {
   fetchLatestBaileysVersion,
   makeCacheableSignalKeyStore,
   isJidBroadcast,
-  isJidNewsletter
+  isJidNewsletter,
+  CacheStore,
+  proto
 } from "baileys";
 
 import Whatsapp from "../models/Whatsapp";
@@ -20,6 +22,7 @@ import { Store } from "./store";
 import { StartWhatsAppSession } from "../services/WbotServices/StartWhatsAppSession";
 import DeleteBaileysService from "../services/BaileysServices/DeleteBaileysService";
 import NodeCache from "node-cache";
+import { LRUCache } from "lru-cache";
 
 const loggerBaileys = MAIN_LOGGER.child({});
 loggerBaileys.level = "error";
@@ -32,8 +35,12 @@ type Session = WASocket & {
 const sessions: Session[] = [];
 
 const retriesQrCodeMap = new Map<number, number>();
+const msgRetryCounterCache = new NodeCache() as CacheStore;
 
-export const sentCache = new NodeCache({ stdTTL: 20, checkperiod: 5 });
+export const sentCache = new LRUCache<string, proto.IMessage>({
+  max: 1000,
+  ttl: 1000 * 60 * 10 // mensagens duram 10 minutos
+});
 
 export const getWbot = (whatsappId: number): Session => {
   const sessionIndex = sessions.findIndex(s => s.id === whatsappId);
@@ -88,8 +95,6 @@ export const initWASocket = async (whatsapp: Whatsapp): Promise<Session> => {
         let wsocket: Session = null;
 
         const { state, saveState } = await authState(whatsapp);
-
-        const msgRetryCounterCache = new NodeCache();
 
         wsocket = makeWASocket({
           logger: loggerBaileys,

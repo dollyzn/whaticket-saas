@@ -87,7 +87,7 @@ const useStyles = makeStyles((theme) => ({
     },
 
     quotedContainerLeft: {
-        margin: "-3px -80px 6px -6px",
+        margin: "-3px -50px 6px -6px",
         overflow: "hidden",
         backgroundColor: "#f0f0f0",
         borderRadius: "7.5px",
@@ -97,7 +97,6 @@ const useStyles = makeStyles((theme) => ({
 
     quotedMsg: {
         padding: 10,
-        maxWidth: 300,
         height: "auto",
         display: "block",
         whiteSpace: "pre-wrap",
@@ -141,7 +140,7 @@ const useStyles = makeStyles((theme) => ({
     },
 
     quotedContainerRight: {
-        margin: "-3px -80px 6px -6px",
+        margin: "-3px -50px 6px -6px",
         overflowY: "hidden",
         backgroundColor: "#cfe9ba",
         borderRadius: "7.5px",
@@ -185,7 +184,7 @@ const useStyles = makeStyles((theme) => ({
 
     textContentItemEdited: {
         overflowWrap: "break-word",
-        padding: "3px 80px 6px 6px",
+        padding: "3px 50px 12px 6px",
     },
 
     textContentItemDeleted: {
