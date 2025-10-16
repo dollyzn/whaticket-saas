@@ -665,27 +665,19 @@ const MessagesList = ({ ticket, ticketId, isGroup }) => {
                             {renderNumberTicket(message, index)}
                             {renderMessageDivider(message, index)}
                             <div className={classes.messageLeft}>
-                                <IconButton
-                                    variant="contained"
-                                    size="small"
-                                    id="messageActionsButton"
-                                    disabled={message.isDeleted}
-                                    className={classes.messageActionsButton}
-                                    onClick={(e) => handleOpenMessageOptionsMenu(e, message)}
-                                >
-                                    <ExpandMore />
-                                </IconButton>
-                                {isGroup && <span className={classes.messageContactName}>{message.contact?.name}</span>}
-
-                                {/* aviso de mensagem apagado pelo contato */}
-                                {message.isDeleted && (
-                                    <div>
-                                        <span className={"message-deleted"}>
-                                            Essa mensagem foi apagada pelo contato &nbsp;
-                                            <Block color="error" fontSize="small" className={classes.deletedIcon} />
-                                        </span>
-                                    </div>
+                                {!message.isDeleted && (
+                                    <IconButton
+                                        variant="contained"
+                                        size="small"
+                                        id="messageActionsButton"
+                                        disabled={message.isDeleted}
+                                        className={classes.messageActionsButton}
+                                        onClick={(e) => handleOpenMessageOptionsMenu(e, message)}
+                                    >
+                                        <ExpandMore />
+                                    </IconButton>
                                 )}
+                                {isGroup && <span className={classes.messageContactName}>{message.contact?.name}</span>}
 
                                 {(message.mediaUrl ||
                                     message.mediaType === "locationMessage" ||
@@ -697,6 +689,12 @@ const MessagesList = ({ ticket, ticketId, isGroup }) => {
                                         [classes.textContentItemEdited]: message.isEdited,
                                     })}
                                 >
+                                    {message.isDeleted && (
+                                        <div className={"message-deleted"}>
+                                            <Block color="disabled" fontSize="small" className={classes.deletedIcon} />
+                                            Mensagem apagada &nbsp;
+                                        </div>
+                                    )}
                                     {message.quotedMsg && renderQuotedMessage(message)}
                                     {isAudioWithTranscribe ? (
                                         <Link
