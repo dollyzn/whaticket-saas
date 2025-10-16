@@ -257,6 +257,7 @@ const useStyles = makeStyles((theme) => ({
         fontSize: 18,
         verticalAlign: "middle",
         marginRight: 4,
+        color: "rgba(0, 0, 0, 0.36)",
     },
 
     ackDoneAllIcon: {
@@ -691,7 +692,7 @@ const MessagesList = ({ ticket, ticketId, isGroup }) => {
                                 >
                                     {message.isDeleted && (
                                         <div className={"message-deleted"}>
-                                            <Block color="disabled" fontSize="small" className={classes.deletedIcon} />
+                                            <Block fontSize="small" className={classes.deletedIcon} />
                                             Mensagem apagada &nbsp;
                                         </div>
                                     )}
@@ -757,9 +758,7 @@ const MessagesList = ({ ticket, ticketId, isGroup }) => {
                                         [classes.textContentItemEdited]: message.isEdited,
                                     })}
                                 >
-                                    {message.isDeleted && (
-                                        <Block color="disabled" fontSize="small" className={classes.deletedIcon} />
-                                    )}
+                                    {message.isDeleted && <Block fontSize="small" className={classes.deletedIcon} />}
                                     {message.quotedMsg && renderQuotedMessage(message)}
                                     {isAudioWithTranscribe ? (
                                         <Link
