@@ -64,7 +64,7 @@ const authState = async (
         set: (data: any) => {
           // eslint-disable-next-line no-restricted-syntax, guard-for-in
           for (const i in data) {
-            const key = KEY_MAP[i as keyof SignalDataTypeMap];
+            const key = KEY_MAP[i];
             keys[key] = keys[key] || {};
             Object.assign(keys[key], data[i]);
           }
