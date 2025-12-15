@@ -468,7 +468,7 @@ const getContactMessage = async (msg: proto.IWebMessageInfo, wbot: Session) => {
 const downloadMedia = async (msg: proto.IWebMessageInfo) => {
   let buffer;
   try {
-    buffer = await downloadMediaMessage(msg, "buffer", {});
+    buffer = await downloadMediaMessage(msg as WAMessage, "buffer", {});
   } catch (err) {
     console.error("Erro ao baixar mídia:", err);
     return null;
@@ -521,7 +521,7 @@ const verifyContact = async (
   msgContact: IMe,
   wbot: Session,
   companyId: number,
-  msg: WAMessage
+  msg: proto.IWebMessageInfo
 ): Promise<Contact> => {
   let profilePicUrl: string;
   try {
@@ -1580,7 +1580,7 @@ export const handleRating = async (
 
 const handleChartbot = async (
   ticket: Ticket,
-  msg: WAMessage,
+  msg: proto.IWebMessageInfo,
   wbot: Session,
   dontReadTheFirstQuestion: boolean = false
 ) => {

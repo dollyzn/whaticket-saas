@@ -2,14 +2,7 @@ import { getIO } from "../../libs/socket";
 import Contact from "../../models/Contact";
 import ContactCustomField from "../../models/ContactCustomField";
 import { isNil } from "lodash";
-import {
-  getSenderLid,
-  jidNormalizedUser,
-  toJid,
-  WAMessage,
-  WASocket
-} from "baileys";
-import { logger } from "../../utils/logger";
+import { jidNormalizedUser, proto } from "baileys";
 import { Op } from "sequelize";
 interface ExtraInfo extends ContactCustomField {
   name: string;
@@ -25,7 +18,7 @@ interface Request {
   companyId: number;
   extraInfo?: ExtraInfo[];
   whatsappId?: number;
-  msg?: WAMessage;
+  msg?: proto.IWebMessageInfo;
 }
 
 const CreateOrUpdateContactService = async ({
@@ -41,15 +34,10 @@ const CreateOrUpdateContactService = async ({
 }: Request): Promise<Contact> => {
   const cleanNumber = number.replace(/\D/g, "");
   const normalizedJid = jidNormalizedUser(number);
-  const senderLid = msg
-    ? getSenderLid(msg)
-    : { lid: undefined, jid: normalizedJid };
-  const jid = toJid(senderLid.lid || senderLid.jid);
 
   const contactIdentifiers = {
-    contactId: jid,
-    lid: senderLid.lid,
-    phoneNumber: jid.replace(/\D/g, "")
+    contactId: normalizedJid,
+    phoneNumber: cleanNumber
   };
 
   const io = getIO();
@@ -60,12 +48,12 @@ const CreateOrUpdateContactService = async ({
       [Op.or]: [
         {
           contactId: {
-            [Op.in]: [jid, normalizedJid, cleanNumber, number]
+            [Op.in]: [normalizedJid, cleanNumber, number]
           }
         },
         {
           lid: {
-            [Op.in]: [jid, normalizedJid, cleanNumber, number]
+            [Op.in]: [normalizedJid, cleanNumber, number]
           }
         },
         { number: cleanNumber },
@@ -80,7 +68,6 @@ const CreateOrUpdateContactService = async ({
       profilePicUrl,
       number: contactIdentifiers.phoneNumber || cleanNumber,
       contactId: contactIdentifiers.contactId,
-      lid: contactIdentifiers.lid,
       phoneNumber: contactIdentifiers.phoneNumber
     });
     if (isNil(contact.whatsappId === null)) {
@@ -103,7 +90,6 @@ const CreateOrUpdateContactService = async ({
       companyId,
       whatsappId,
       contactId: contactIdentifiers.contactId,
-      lid: contactIdentifiers.lid,
       phoneNumber: contactIdentifiers.phoneNumber
     });
 
